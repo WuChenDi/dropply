@@ -79,7 +79,7 @@ importers:
         specifier: catalog:dev
         version: 5.9.2
 
-  apps/backend:
+  apps/api:
     dependencies:
       '@hono/zod-validator':
         specifier: catalog:prod
@@ -116,7 +116,7 @@ importers:
         specifier: catalog:dev
         version: 4.31.0(@cloudflare/workers-types@4.20250821.0)
 
-  apps/frontend:
+  apps/web:
     dependencies:
       next:
         specifier: catalog:prod

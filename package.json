@@ -1,5 +1,5 @@
 {
-  "name": "@cdlab996/droply-turborepo",
+  "name": "@cdlab996/dropply-turbopack",
   "type": "module",
   "version": "1.0.0",
   "private": true,
@@ -9,7 +9,7 @@
   "homepage": "https://github.com/WuChenDi",
   "repository": {
     "type": "git",
-    "url": "https://github.com/WuChenDi/droply.git"
+    "url": "https://github.com/WuChenDi/dropply.git"
   },
   "engines": {
     "node": ">=20"
@@ -20,8 +20,8 @@
   ],
   "scripts": {
     "build": "turbo run build",
-    "build:be": "pnpm -C apps/backend run deploy",
-    "build:fe": "turbo run build --filter=./apps/frontend",
+    "build:api": "pnpm -C apps/api run deploy",
+    "build:web": "turbo run build --filter=./apps/web",
     "dev": "turbo run dev",
     "lint": "turbo run lint",
     "check-types": "turbo run check-types",

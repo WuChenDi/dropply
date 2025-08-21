@@ -1,0 +1,11 @@
+{
+  "name": "dropply",
+  "compatibility_date": "2025-08-21",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+  "assets": {
+    "directory": "./out",
+    "not_found_handling": "404-page"
+  }
+}
