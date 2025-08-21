@@ -20,7 +20,7 @@
   ],
   "scripts": {
     "build": "turbo run build",
-    "build:be": "turbo run deploy --filter=./apps/backend",
+    "build:be": "pnpm -C apps/backend run deploy",
     "build:fe": "turbo run build --filter=./apps/frontend",
     "dev": "turbo run dev",
     "lint": "turbo run lint",
