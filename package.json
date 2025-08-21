@@ -1,0 +1,35 @@
+{
+  "name": "@cdlab996/droply-turborepo",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "packageManager": "pnpm@10.15.0",
+  "author": "wudi <wuchendi96@gmail.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/WuChenDi",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/WuChenDi/droply.git"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "turbo run build",
+    "build:be": "turbo run deploy --filter=./apps/backend",
+    "build:fe": "turbo run build --filter=./apps/frontend",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "check-types": "turbo run check-types",
+    "clean": "bash ./scripts/clean.sh",
+    "prepare": "turbo run build --filter=./packages/*"
+  },
+  "devDependencies": {
+    "turbo": "catalog:dev",
+    "typescript": "catalog:dev"
+  }
+}

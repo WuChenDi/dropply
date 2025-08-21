@@ -1,0 +1,60 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "droply-backend",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-08-21",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+  "vars": {
+    // The Service runtime preset to use for deployment.
+    "DEPLOY_RUNTIME": "cf",
+    // Database Type
+    "DB_TYPE": "d1",
+    // LibSQL Configuration
+    // The URL for connecting to the LibSQL database. Default is a local SQLite file.
+    "LIBSQL_URL": "libsql://your-libsql-database-url",
+    // The authentication token for accessing the LibSQL
+    "LIBSQL_AUTH_TOKEN": "your-libsql-auth-token",
+
+    "REQUIRE_TOTP": "false",
+    "JWT_SECRET": "Chbq8SyG+AV1FMwoMKS7j9SHmWOlIg9VhPYSP5GnwcU=",
+    "TOTP_SECRETS": "admin:7V7NKSC6Q23Y4WCEE5HDEBPU3GPIU6ZH",
+  },
+  // "kv_namespaces": [
+  //   {
+  //     "binding": "MY_KV_NAMESPACE",
+  //     "id": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+  //   }
+  // ],
+  // "r2_buckets": [
+  //   {
+  //     "binding": "droply",
+  //     "bucket_name": "R2_STORAGE"
+  //   }
+  // ],
+  "r2_buckets": [
+    {
+      "binding": "droply",
+      "bucket_name": "my-bucket"
+    }
+  ],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "droply",
+      "migrations_dir": "./src/database",
+      "database_id": "9d822795-c7d6-45d7-b05b-3ac6aaf573ed"
+    }
+  ],
+  // "ai": {
+  //   "binding": "AI"
+  // },
+  "triggers": {
+		"crons": ["0 * * * *"],
+  },
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1
+  }
+}

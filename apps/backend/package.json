@@ -1,0 +1,41 @@
+{
+  "name": "@cdlab996/droply-backend",
+  "type": "module",
+  "version": "1.0.0",
+  "author": "wudi <wuchendi96@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/WuChenDi/droply.git",
+    "directory": "apps/backend"
+  },
+  "scripts": {
+    "dev": "wrangler dev --ip 0.0.0.0 --port 3000 src/index.ts",
+    "deploy": "wrangler deploy --minify",
+    "build": "bun build src/index.ts --outdir dist --target browser",
+    "cf-typegen": "wrangler types --env-interface CloudflareBindings",
+    "cf:localdb": "wrangler d1 migrations apply droply-db",
+    "cf:remotedb": "wrangler d1 migrations apply droply-db --remote",
+    "db:studio": "drizzle-kit studio --port 3001 --host 0.0.0.0",
+    "db:pull": "drizzle-kit pull",
+    "db:push": "drizzle-kit push",
+    "db:gen": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:up": "drizzle-kit up"
+  },
+  "dependencies": {
+    "@hono/zod-validator": "catalog:prod",
+    "@libsql/client": "catalog:prod",
+    "drizzle-orm": "catalog:prod",
+    "hono": "catalog:prod",
+    "winston": "catalog:prod",
+    "winston-daily-rotate-file": "catalog:prod",
+    "zod": "catalog:prod"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "catalog:dev",
+    "@types/node": "catalog:dev",
+    "drizzle-kit": "catalog:dev",
+    "wrangler": "catalog:dev"
+  }
+}
