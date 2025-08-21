@@ -4,4 +4,4 @@
 
 ## 📜 License
 
-[MIT](./LICENSE) License © 2025-PRESENT [nsiod](https://github.com/nsiod)
+[MIT](./LICENSE) License &copy; 2025-PRESENT [wudi](https://github.com/WuChenDi)
