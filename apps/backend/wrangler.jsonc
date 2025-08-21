@@ -27,16 +27,10 @@
   //     "id": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
   //   }
   // ],
-  // "r2_buckets": [
-  //   {
-  //     "binding": "droply",
-  //     "bucket_name": "R2_STORAGE"
-  //   }
-  // ],
   "r2_buckets": [
     {
-      "binding": "droply",
-      "bucket_name": "my-bucket"
+      "binding": "R2_STORAGE",
+      "bucket_name": "droply"
     }
   ],
   "d1_databases": [
@@ -51,7 +45,9 @@
   //   "binding": "AI"
   // },
   "triggers": {
-		"crons": ["0 * * * *"],
+    "crons": [
+      "0 * * * *"
+    ],
   },
   "observability": {
     "enabled": true,
