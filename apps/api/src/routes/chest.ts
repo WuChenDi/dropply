@@ -62,7 +62,10 @@ chestRoutes.post('/chest', async (c) => {
       throw new HTTPException(500, { message: 'TOTP not configured on server' })
     }
 
-    const isValidTOTP = await verifyAnyTOTP(requestBody.totpToken, c.env.TOTP_SECRETS)
+    const isValidTOTP = await verifyAnyTOTP(
+      requestBody.totpToken,
+      c.env.TOTP_SECRETS,
+    )
     if (!isValidTOTP) {
       throw new HTTPException(401, { message: 'Invalid TOTP token' })
     }
@@ -123,18 +126,24 @@ chestRoutes.post('/chest/:sessionId/upload', async (c) => {
       and(
         eq(sessions.id, sessionId),
         eq(sessions.uploadComplete, 0),
-        withNotDeleted(sessions)
-      )
+        withNotDeleted(sessions),
+      ),
     )
     .get()
 
   if (!session) {
-    throw new HTTPException(404, { message: 'Session not found or already completed' })
+    throw new HTTPException(404, {
+      message: 'Session not found or already completed',
+    })
   }
 
   // 解析表单数据
   const formData = await c.req.formData()
-  const uploadedFiles: Array<{ fileId: string; filename: string; isText: boolean }> = []
+  const uploadedFiles: Array<{
+    fileId: string
+    filename: string
+    isText: boolean
+  }> = []
   const r2Operations: Promise<any>[] = []
   const fileInserts: any[] = []
 
@@ -147,7 +156,9 @@ chestRoutes.post('/chest/:sessionId/upload', async (c) => {
       const fileSize = value.size
 
       // 队列化R2操作
-      r2Operations.push(c.env.R2_STORAGE.put(`${sessionId}/${fileId}`, value.stream()))
+      r2Operations.push(
+        c.env.R2_STORAGE.put(`${sessionId}/${fileId}`, value.stream()),
+      )
 
       // 队列化数据库操作
       fileInserts.push({
@@ -195,10 +206,15 @@ chestRoutes.post('/chest/:sessionId/upload', async (c) => {
     // 并行执行所有操作
     await Promise.all([
       Promise.all(r2Operations),
-      fileInserts.length > 0 ? db?.insert(files).values(fileInserts) : Promise.resolve(),
+      fileInserts.length > 0
+        ? db?.insert(files).values(fileInserts)
+        : Promise.resolve(),
     ])
 
-    logger.info('Files uploaded successfully', { sessionId, count: uploadedFiles.length })
+    logger.info('Files uploaded successfully', {
+      sessionId,
+      count: uploadedFiles.length,
+    })
 
     const response: UploadFileResponse = { uploadedFiles }
     return c.json(response)
@@ -248,7 +264,9 @@ chestRoutes.post('/chest/:sessionId/complete', async (c) => {
     .where(and(eq(files.sessionId, sessionId), withNotDeleted(files)))
 
   if (fileCount?.length !== fileIds.length) {
-    throw new HTTPException(400, { message: 'Some files do not belong to this session' })
+    throw new HTTPException(400, {
+      message: 'Some files do not belong to this session',
+    })
   }
 
   const retrievalCode = generateRetrievalCode()
@@ -268,11 +286,15 @@ chestRoutes.post('/chest/:sessionId/complete', async (c) => {
         and(
           eq(sessions.id, sessionId),
           eq(sessions.uploadComplete, 0),
-          withNotDeleted(sessions)
-        )
+          withNotDeleted(sessions),
+        ),
       )
 
-    logger.info('Chest upload completed', { sessionId, retrievalCode, expiryDate })
+    logger.info('Chest upload completed', {
+      sessionId,
+      retrievalCode,
+      expiryDate,
+    })
 
     const response: CompleteUploadResponse = {
       retrievalCode,
@@ -317,20 +339,24 @@ chestRoutes.post('/chest/:sessionId/multipart/create', async (c) => {
       and(
         eq(sessions.id, sessionId),
         eq(sessions.uploadComplete, 0),
-        withNotDeleted(sessions)
-      )
+        withNotDeleted(sessions),
+      ),
     )
     .get()
 
   if (!session) {
-    throw new HTTPException(404, { message: 'Session not found or already completed' })
+    throw new HTTPException(404, {
+      message: 'Session not found or already completed',
+    })
   }
 
   const body: CreateMultipartUploadRequest = await c.req.json()
   const { filename, mimeType, fileSize } = body
 
   if (!filename || !mimeType || !fileSize || fileSize <= 0) {
-    throw new HTTPException(400, { message: 'Invalid multipart upload parameters' })
+    throw new HTTPException(400, {
+      message: 'Invalid multipart upload parameters',
+    })
   }
 
   const fileId = generateUUID()
@@ -338,7 +364,7 @@ chestRoutes.post('/chest/:sessionId/multipart/create', async (c) => {
   try {
     // 在R2创建分片上传
     const multipartUpload = await c.env.R2_STORAGE.createMultipartUpload(
-      `${sessionId}/${fileId}`
+      `${sessionId}/${fileId}`,
     )
 
     // 创建分片JWT（48小时有效期）
@@ -349,7 +375,7 @@ chestRoutes.post('/chest/:sessionId/multipart/create', async (c) => {
       filename,
       mimeType,
       fileSize,
-      c.env.JWT_SECRET
+      c.env.JWT_SECRET,
     )
 
     logger.info('Multipart upload created', { sessionId, fileId, filename })
@@ -361,70 +387,92 @@ chestRoutes.post('/chest/:sessionId/multipart/create', async (c) => {
 
     return c.json(response)
   } catch (error) {
-    logger.error('Failed to create multipart upload', { sessionId, fileId, error })
-    throw new HTTPException(500, { message: 'Failed to create multipart upload' })
+    logger.error('Failed to create multipart upload', {
+      sessionId,
+      fileId,
+      error,
+    })
+    throw new HTTPException(500, {
+      message: 'Failed to create multipart upload',
+    })
   }
 })
 
 // PUT /chest/:sessionId/multipart/:fileId/part/:partNumber - 上传分片
-chestRoutes.put('/chest/:sessionId/multipart/:fileId/part/:partNumber', async (c) => {
-  const sessionId = c.req.param('sessionId')
-  const fileId = c.req.param('fileId')
-  const partNumber = Number.parseInt(c.req.param('partNumber'))
+chestRoutes.put(
+  '/chest/:sessionId/multipart/:fileId/part/:partNumber',
+  async (c) => {
+    const sessionId = c.req.param('sessionId')
+    const fileId = c.req.param('fileId')
+    const partNumber = Number.parseInt(c.req.param('partNumber'))
 
-  // 验证分片JWT令牌
-  const authHeader = c.req.header('Authorization')
-  if (!authHeader?.startsWith('Bearer ')) {
-    throw new HTTPException(401, { message: 'Unauthorized' })
-  }
-
-  const token = authHeader.substring(7)
-  let payload
-  try {
-    payload = await verifyMultipartJWT(token, c.env.JWT_SECRET)
-  } catch (error) {
-    throw new HTTPException(401, { message: 'Invalid multipart token' })
-  }
-
-  if (payload.sessionId !== sessionId || payload.fileId !== fileId) {
-    throw new HTTPException(403, { message: 'Token does not match upload session' })
-  }
-
-  if (!isValidUUID(sessionId) || !isValidUUID(fileId)) {
-    throw new HTTPException(400, { message: 'Invalid session or file ID format' })
-  }
-
-  if (partNumber < 1 || partNumber > 10000) {
-    throw new HTTPException(400, { message: 'Invalid part number' })
-  }
-
-  // 获取请求体
-  const body = await c.req.arrayBuffer()
-  if (!body || body.byteLength === 0) {
-    throw new HTTPException(400, { message: 'Empty part body' })
-  }
-
-  try {
-    // 恢复分片上传并上传分片
-    const multipartUpload = c.env.R2_STORAGE.resumeMultipartUpload(
-      `${sessionId}/${fileId}`,
-      payload.uploadId
-    )
-    const uploadedPart = await multipartUpload.uploadPart(partNumber, body)
-
-    logger.info('Part uploaded successfully', { sessionId, fileId, partNumber })
-
-    const response: UploadPartResponse = {
-      etag: uploadedPart.etag,
-      partNumber,
+    // 验证分片JWT令牌
+    const authHeader = c.req.header('Authorization')
+    if (!authHeader?.startsWith('Bearer ')) {
+      throw new HTTPException(401, { message: 'Unauthorized' })
     }
 
-    return c.json(response)
-  } catch (error) {
-    logger.error('Failed to upload part', { sessionId, fileId, partNumber, error })
-    throw new HTTPException(500, { message: 'Failed to upload part' })
-  }
-})
+    const token = authHeader.substring(7)
+    let payload
+    try {
+      payload = await verifyMultipartJWT(token, c.env.JWT_SECRET)
+    } catch (error) {
+      throw new HTTPException(401, { message: 'Invalid multipart token' })
+    }
+
+    if (payload.sessionId !== sessionId || payload.fileId !== fileId) {
+      throw new HTTPException(403, {
+        message: 'Token does not match upload session',
+      })
+    }
+
+    if (!isValidUUID(sessionId) || !isValidUUID(fileId)) {
+      throw new HTTPException(400, {
+        message: 'Invalid session or file ID format',
+      })
+    }
+
+    if (partNumber < 1 || partNumber > 10000) {
+      throw new HTTPException(400, { message: 'Invalid part number' })
+    }
+
+    // 获取请求体
+    const body = await c.req.arrayBuffer()
+    if (!body || body.byteLength === 0) {
+      throw new HTTPException(400, { message: 'Empty part body' })
+    }
+
+    try {
+      // 恢复分片上传并上传分片
+      const multipartUpload = c.env.R2_STORAGE.resumeMultipartUpload(
+        `${sessionId}/${fileId}`,
+        payload.uploadId,
+      )
+      const uploadedPart = await multipartUpload.uploadPart(partNumber, body)
+
+      logger.info('Part uploaded successfully', {
+        sessionId,
+        fileId,
+        partNumber,
+      })
+
+      const response: UploadPartResponse = {
+        etag: uploadedPart.etag,
+        partNumber,
+      }
+
+      return c.json(response)
+    } catch (error) {
+      logger.error('Failed to upload part', {
+        sessionId,
+        fileId,
+        partNumber,
+        error,
+      })
+      throw new HTTPException(500, { message: 'Failed to upload part' })
+    }
+  },
+)
 
 // POST /chest/:sessionId/multipart/:fileId/complete - 完成分片上传
 chestRoutes.post('/chest/:sessionId/multipart/:fileId/complete', async (c) => {
@@ -447,11 +495,15 @@ chestRoutes.post('/chest/:sessionId/multipart/:fileId/complete', async (c) => {
   }
 
   if (payload.sessionId !== sessionId || payload.fileId !== fileId) {
-    throw new HTTPException(403, { message: 'Token does not match upload session' })
+    throw new HTTPException(403, {
+      message: 'Token does not match upload session',
+    })
   }
 
   if (!isValidUUID(sessionId) || !isValidUUID(fileId)) {
-    throw new HTTPException(400, { message: 'Invalid session or file ID format' })
+    throw new HTTPException(400, {
+      message: 'Invalid session or file ID format',
+    })
   }
 
   const body: CompleteMultipartUploadRequest = await c.req.json()
@@ -468,7 +520,7 @@ chestRoutes.post('/chest/:sessionId/multipart/:fileId/complete', async (c) => {
     // 恢复分片上传并完成
     const multipartUpload = c.env.R2_STORAGE.resumeMultipartUpload(
       `${sessionId}/${fileId}`,
-      payload.uploadId
+      payload.uploadId,
     )
     await multipartUpload.complete(sortedParts)
 
@@ -496,7 +548,13 @@ chestRoutes.post('/chest/:sessionId/multipart/:fileId/complete', async (c) => {
 
     return c.json(response)
   } catch (error) {
-    logger.error('Failed to complete multipart upload', { sessionId, fileId, error })
-    throw new HTTPException(500, { message: 'Failed to complete multipart upload' })
+    logger.error('Failed to complete multipart upload', {
+      sessionId,
+      fileId,
+      error,
+    })
+    throw new HTTPException(500, {
+      message: 'Failed to complete multipart upload',
+    })
   }
 })

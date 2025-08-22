@@ -8,7 +8,10 @@ import type { Context } from 'hono'
 
 class DatabaseManager {
   static instance: DatabaseManager
-  public db: LibSQLDatabase<typeof schema> | DrizzleD1Database<typeof schema> | undefined
+  public db:
+    | LibSQLDatabase<typeof schema>
+    | DrizzleD1Database<typeof schema>
+    | undefined
 
   constructor(c?: Context) {
     if (DatabaseManager.instance) {
@@ -37,7 +40,9 @@ class DatabaseManager {
       }
       case 'd1': {
         logger.info(
-          c ? 'Using context for D1 database' : 'No context provided for D1 database'
+          c
+            ? 'Using context for D1 database'
+            : 'No context provided for D1 database',
         )
         if (!c?.env?.DB) {
           throw new Error('D1 database not found in context')

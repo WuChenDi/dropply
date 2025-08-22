@@ -1,42 +1,42 @@
-'use client';
+'use client'
 
-import { useState } from 'react';
-import { TextItem } from '@/lib/types';
+import { useState } from 'react'
+import { TextItem } from '@/lib/types'
 
 interface TextInputProps {
-  onTextItemsChange: (items: TextItem[]) => void;
-  textItems: TextItem[];
+  onTextItemsChange: (items: TextItem[]) => void
+  textItems: TextItem[]
 }
 
 export function TextInput({ onTextItemsChange, textItems }: TextInputProps) {
-  const [currentText, setCurrentText] = useState('');
-  const [currentFilename, setCurrentFilename] = useState('');
+  const [currentText, setCurrentText] = useState('')
+  const [currentFilename, setCurrentFilename] = useState('')
 
   const addTextItem = () => {
-    if (!currentText.trim()) return;
-    
-    const defaultName = `Text ${textItems.length + 1}`;
-    const displayName = currentFilename.trim() || defaultName;
+    if (!currentText.trim()) return
+
+    const defaultName = `Text ${textItems.length + 1}`
+    const displayName = currentFilename.trim() || defaultName
     const newItem: TextItem = {
       content: currentText,
-      filename: `${displayName}.txt` // Still store as .txt for backend
-    };
-    
-    onTextItemsChange([...textItems, newItem]);
-    setCurrentText('');
-    setCurrentFilename('');
-  };
+      filename: `${displayName}.txt`, // Still store as .txt for backend
+    }
+
+    onTextItemsChange([...textItems, newItem])
+    setCurrentText('')
+    setCurrentFilename('')
+  }
 
   const removeTextItem = (index: number) => {
-    const newItems = textItems.filter((_, i) => i !== index);
-    onTextItemsChange(newItems);
-  };
+    const newItems = textItems.filter((_, i) => i !== index)
+    onTextItemsChange(newItems)
+  }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
-      addTextItem();
+      addTextItem()
     }
-  };
+  }
 
   return (
     <div className="w-full space-y-4">
@@ -54,7 +54,7 @@ export function TextInput({ onTextItemsChange, textItems }: TextInputProps) {
               className="w-full h-48 p-4 border-2 border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-sm"
             />
           </div>
-          
+
           <div className="flex gap-2">
             <div className="flex-1">
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -86,9 +86,9 @@ export function TextInput({ onTextItemsChange, textItems }: TextInputProps) {
           <h3 className="font-medium">Text Items ({textItems.length})</h3>
           {textItems.map((item, index) => {
             // Remove .txt extension for display
-            const displayName = item.filename?.endsWith('.txt') 
+            const displayName = item.filename?.endsWith('.txt')
               ? item.filename.slice(0, -4)
-              : item.filename || `Text ${index + 1}`;
+              : item.filename || `Text ${index + 1}`
             return (
               <div key={index} className="p-3 bg-gray-50 rounded">
                 <div className="flex items-start justify-between">
@@ -110,10 +110,10 @@ export function TextInput({ onTextItemsChange, textItems }: TextInputProps) {
                   </button>
                 </div>
               </div>
-            );
+            )
           })}
         </div>
       )}
     </div>
-  );
+  )
 }

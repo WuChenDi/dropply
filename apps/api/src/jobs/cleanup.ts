@@ -12,7 +12,9 @@ export interface CleanupResult {
 }
 
 // 清理过期内容（每小时运行的定时任务）
-export async function cleanupExpiredContent(env: CloudflareEnv): Promise<CleanupResult> {
+export async function cleanupExpiredContent(
+  env: CloudflareEnv,
+): Promise<CleanupResult> {
   const currentTime = new Date()
   const errors: string[] = []
   let expiredSessions = 0
@@ -20,7 +22,9 @@ export async function cleanupExpiredContent(env: CloudflareEnv): Promise<Cleanup
   let r2ObjectsDeleted = 0
   let incompleteSessions = 0
 
-  logger.info('Starting scheduled cleanup job', { timestamp: currentTime.toISOString() })
+  logger.info('Starting scheduled cleanup job', {
+    timestamp: currentTime.toISOString(),
+  })
 
   try {
     // 使用临时数据库连接进行清理
@@ -65,8 +69,8 @@ export async function cleanupExpiredContent(env: CloudflareEnv): Promise<Cleanup
         and(
           eq(sessions.uploadComplete, 0),
           lt(sessions.createdAt, cutoffTime),
-          withNotDeleted(sessions)
-        )
+          withNotDeleted(sessions),
+        ),
       )
 
     if (!incompleteSessionsResult) {
@@ -80,12 +84,17 @@ export async function cleanupExpiredContent(env: CloudflareEnv): Promise<Cleanup
       }
     }
 
-    logger.info(`Found ${incompleteSessionsResult.length} incomplete sessions (>48h old)`)
+    logger.info(
+      `Found ${incompleteSessionsResult.length} incomplete sessions (>48h old)`,
+    )
 
     // 合并过期和未完成的会话进行清理
     const allSessionsToCleanup = [
       ...expiredSessionsResult.map((s) => ({ id: s.id, reason: 'expired' })),
-      ...incompleteSessionsResult.map((s) => ({ id: s.id, reason: 'incomplete' })),
+      ...incompleteSessionsResult.map((s) => ({
+        id: s.id,
+        reason: 'incomplete',
+      })),
     ]
 
     logger.info(`Total sessions to cleanup: ${allSessionsToCleanup.length}`)
@@ -112,20 +121,24 @@ export async function cleanupExpiredContent(env: CloudflareEnv): Promise<Cleanup
 
         // 4. 删除R2中的所有对象
         try {
-          const listResult = await env.R2_STORAGE.list({ prefix: `${sessionId}/` })
+          const listResult = await env.R2_STORAGE.list({
+            prefix: `${sessionId}/`,
+          })
 
           if (listResult.objects.length > 0) {
             const deletePromises = listResult.objects.map((obj) =>
-              env.R2_STORAGE.delete(obj.key)
+              env.R2_STORAGE.delete(obj.key),
             )
             await Promise.all(deletePromises)
             r2ObjectsDeleted += listResult.objects.length
             logger.info(
-              `Deleted ${listResult.objects.length} R2 objects for session ${sessionId}`
+              `Deleted ${listResult.objects.length} R2 objects for session ${sessionId}`,
             )
           }
         } catch (error) {
-          errors.push(`Failed to delete R2 objects for session ${sessionId}: ${error}`)
+          errors.push(
+            `Failed to delete R2 objects for session ${sessionId}: ${error}`,
+          )
         }
 
         // 5. 软删除数据库记录（先删除文件，再删除会话）
@@ -163,7 +176,9 @@ export async function cleanupExpiredContent(env: CloudflareEnv): Promise<Cleanup
           incompleteSessions++
         }
 
-        logger.info(`Cleaned up session ${sessionId} (${reason}) with ${fileCount} files`)
+        logger.info(
+          `Cleaned up session ${sessionId} (${reason}) with ${fileCount} files`,
+        )
       } catch (error) {
         errors.push(`Failed to cleanup session ${sessionId}: ${error}`)
         logger.error(`Error cleaning session ${sessionId}`, { error })

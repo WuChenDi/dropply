@@ -1,4 +1,10 @@
-import { integer, sqliteTable, text, uniqueIndex, index } from 'drizzle-orm/sqlite-core'
+import {
+  integer,
+  sqliteTable,
+  text,
+  uniqueIndex,
+  index,
+} from 'drizzle-orm/sqlite-core'
 
 const trackingFields = {
   createdAt: integer('created_at', { mode: 'timestamp' })
@@ -24,7 +30,7 @@ export const sessions = sqliteTable(
   (table) => [
     uniqueIndex('idx_sessions_retrieval_code').on(table.retrievalCode),
     index('idx_sessions_expires_at').on(table.expiresAt),
-  ]
+  ],
 )
 
 // 文件表
@@ -42,7 +48,7 @@ export const files = sqliteTable(
     isText: integer('is_text').notNull().default(0),
     ...trackingFields,
   },
-  (table) => [index('idx_files_session_id').on(table.sessionId)]
+  (table) => [index('idx_files_session_id').on(table.sessionId)],
 )
 
 export type Session = typeof sessions.$inferSelect

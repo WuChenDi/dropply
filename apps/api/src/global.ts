@@ -41,7 +41,7 @@ const logger =
               winston.format.timestamp(),
               winston.format.printf(({ timestamp, level, message }) => {
                 return `${timestamp} [${level}]: ${message}`
-              })
+              }),
             ),
           }),
           new DailyRotateFile({
@@ -52,7 +52,7 @@ const logger =
             maxFiles: '14d',
             format: winston.format.combine(
               winston.format.timestamp(),
-              winston.format.json()
+              winston.format.json(),
             ),
           }),
         ],

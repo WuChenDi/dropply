@@ -3,9 +3,7 @@
   "name": "dropply-api",
   "main": "src/index.ts",
   "compatibility_date": "2025-08-21",
-  "compatibility_flags": [
-    "nodejs_compat"
-  ],
+  "compatibility_flags": ["nodejs_compat"],
   "vars": {
     // The Service runtime preset to use for deployment.
     "DEPLOY_RUNTIME": "cf",
@@ -36,9 +34,7 @@
   //   }
   // ],
   "triggers": {
-    "crons": [
-      "0 * * * *"
-    ]
+    "crons": ["0 * * * *"]
   },
   "observability": {
     "enabled": true,
