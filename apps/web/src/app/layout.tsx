@@ -69,7 +69,7 @@ export const metadata: Metadata = {
     siteName: 'Dropply',
     images: [
       {
-        url: 'https://cdn.jsdelivr.net/gh/cdLab996/picture-lib/wudi/Clearify/index.png',
+        url: 'https://cdn.jsdelivr.net/gh/cdLab996/picture-lib/wudi/Dropply/index.png',
       },
     ],
     locale: 'en_US',
@@ -81,7 +81,7 @@ export const metadata: Metadata = {
     description:
       'Share files instantly with military-grade encryption. No accounts, no tracking, just pure privacy.',
     images: [
-      'https://cdn.jsdelivr.net/gh/cdLab996/picture-lib/wudi/Clearify/index.png',
+      'https://cdn.jsdelivr.net/gh/cdLab996/picture-lib/wudi/Dropply/index.png',
     ],
     site: '@wuchendi96',
     creator: '@wuchendi96',
