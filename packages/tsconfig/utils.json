@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "./base.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "declaration": true,
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "declarationMap": true,
+    "target": "ES6",
+    "types": ["node"]
+  }
+}

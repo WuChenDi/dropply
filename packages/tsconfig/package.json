@@ -1,0 +1,19 @@
+{
+  "name": "@cdlab996/dropply-tsconfig",
+  "version": "1.0.0",
+  "description": "tsconfig for cdlab996 dropply",
+  "homepage": "https://github.com/WuChenDi",
+  "author": "wudi <wuchendi96@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/WuChenDi/dropply.git",
+    "directory": "packages/tsconfig"
+  },
+  "scripts": {
+    "prepare": "ts-patch install -s"
+  },
+  "devDependencies": {
+    "ts-patch": "catalog:dev"
+  }
+}
