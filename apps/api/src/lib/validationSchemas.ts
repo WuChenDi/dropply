@@ -98,3 +98,17 @@ export const retrievalCodeParamSchema = z.object({
       'Retrieval code must contain only uppercase letters and numbers',
     ),
 })
+
+export const emailShareSchema = z.object({
+  retrievalCode: z
+    .string()
+    .length(6, 'Retrieval code must be 6 characters')
+    .regex(/^[A-Z0-9]{6}$/, 'Invalid retrieval code format'),
+  recipientEmail: z
+    .string()
+    .email('Invalid email address')
+    .max(254, 'Email address too long'),
+  recipientName: z.string().max(100, 'Recipient name too long').optional(),
+  senderName: z.string().max(100, 'Sender name too long').optional(),
+  message: z.string().max(500, 'Message too long').optional(),
+})

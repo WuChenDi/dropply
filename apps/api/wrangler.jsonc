@@ -17,7 +17,12 @@
 
     "REQUIRE_TOTP": "false",
     "JWT_SECRET": "Chbq8SyG+AV1FMwoMKS7j9SHmWOlIg9VhPYSP5GnwcU=",
-    "TOTP_SECRETS": "admin:7V7NKSC6Q23Y4WCEE5HDEBPU3GPIU6ZH"
+    "TOTP_SECRETS": "admin:7V7NKSC6Q23Y4WCEE5HDEBPU3GPIU6ZH",
+
+    // Email Configuration
+    "ENABLE_EMAIL_SHARE": "true",
+    "RESEND_API_KEY": "re_AEgBMyPG_EjQY1mHdV8EC2hJGjQYoseDq",
+    "RESEND_FROM_EMAIL": "noreply@resend.dev"
   },
   "r2_buckets": [
     {

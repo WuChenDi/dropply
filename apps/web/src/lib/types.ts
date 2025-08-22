@@ -82,3 +82,21 @@ export interface FileUploadProgress {
     | 'completed'
     | 'error'
 }
+
+export interface EmailShareRequest {
+  retrievalCode: string
+  recipientEmail: string
+  recipientName?: string
+  senderName?: string
+  message?: string
+}
+
+export interface EmailShareResponse {
+  success: boolean
+  message: string
+}
+
+export interface ServerConfig {
+  requireTOTP: boolean
+  emailShareEnabled: boolean
+}

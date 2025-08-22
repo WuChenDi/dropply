@@ -4,6 +4,11 @@ export interface CloudflareEnv {
   JWT_SECRET: string
   TOTP_SECRETS?: string
   REQUIRE_TOTP?: string
+
+  // Email Configuration
+  ENABLE_EMAIL_SHARE?: string
+  RESEND_API_KEY?: string
+  RESEND_FROM_EMAIL?: string
 }
 
 // API 请求/响应类型
