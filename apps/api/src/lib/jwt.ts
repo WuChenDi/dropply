@@ -1,4 +1,8 @@
-import type { UploadJWTPayload, ChestJWTPayload, MultipartJWTPayload } from '@/types'
+import type {
+  UploadJWTPayload,
+  ChestJWTPayload,
+  MultipartJWTPayload,
+} from '@/types'
 
 // 安全编码UTF-8字符串为base64url
 function base64UrlEncode(str: string): string {
@@ -32,10 +36,14 @@ async function signJWT(payload: object, secret: string): Promise<string> {
     encoder.encode(secret),
     { name: 'HMAC', hash: 'SHA-256' },
     false,
-    ['sign']
+    ['sign'],
   )
 
-  const signature = await crypto.subtle.sign('HMAC', key, encoder.encode(message))
+  const signature = await crypto.subtle.sign(
+    'HMAC',
+    key,
+    encoder.encode(message),
+  )
   const signatureB64 = btoa(String.fromCharCode(...new Uint8Array(signature)))
     .replace(/[=]/g, '')
     .replace(/\+/g, '-')
@@ -64,18 +72,18 @@ async function verifyJWT(token: string, secret: string): Promise<any> {
     encoder.encode(secret),
     { name: 'HMAC', hash: 'SHA-256' },
     false,
-    ['verify']
+    ['verify'],
   )
 
   const signature = Uint8Array.from(
     atob(signatureB64.replace(/-/g, '+').replace(/_/g, '/')),
-    (c) => c.charCodeAt(0)
+    (c) => c.charCodeAt(0),
   )
   const isValid = await crypto.subtle.verify(
     'HMAC',
     key,
     signature,
-    encoder.encode(message)
+    encoder.encode(message),
   )
 
   if (!isValid) {
@@ -93,7 +101,7 @@ async function verifyJWT(token: string, secret: string): Promise<any> {
 
 export async function createUploadJWT(
   sessionId: string,
-  secret: string
+  secret: string,
 ): Promise<string> {
   const now = Math.floor(Date.now() / 1000)
   const payload: UploadJWTPayload = {
@@ -108,7 +116,7 @@ export async function createUploadJWT(
 export async function createChestJWT(
   sessionId: string,
   expiryTimestamp: Date | null,
-  secret: string
+  secret: string,
 ): Promise<string> {
   const now = Math.floor(Date.now() / 1000)
   const expiry = expiryTimestamp
@@ -131,7 +139,7 @@ export async function createMultipartJWT(
   filename: string,
   mimeType: string,
   fileSize: number,
-  secret: string
+  secret: string,
 ): Promise<string> {
   const now = Math.floor(Date.now() / 1000)
   const payload: MultipartJWTPayload = {
@@ -150,7 +158,7 @@ export async function createMultipartJWT(
 
 export async function verifyUploadJWT(
   token: string,
-  secret: string
+  secret: string,
 ): Promise<UploadJWTPayload> {
   const payload = await verifyJWT(token, secret)
   if (payload.type !== 'upload') {
@@ -161,7 +169,7 @@ export async function verifyUploadJWT(
 
 export async function verifyChestJWT(
   token: string,
-  secret: string
+  secret: string,
 ): Promise<ChestJWTPayload> {
   const payload = await verifyJWT(token, secret)
   if (payload.type !== 'chest') {
@@ -172,7 +180,7 @@ export async function verifyChestJWT(
 
 export async function verifyMultipartJWT(
   token: string,
-  secret: string
+  secret: string,
 ): Promise<MultipartJWTPayload> {
   const payload = await verifyJWT(token, secret)
   if (payload.type !== 'multipart') {

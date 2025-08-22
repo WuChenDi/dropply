@@ -53,16 +53,23 @@ function base32Decode(str: string): Uint8Array {
   return new Uint8Array(result)
 }
 
-async function hmacSHA1(key: Uint8Array, data: Uint8Array): Promise<Uint8Array> {
+async function hmacSHA1(
+  key: Uint8Array,
+  data: Uint8Array,
+): Promise<Uint8Array> {
   const cryptoKey = await crypto.subtle.importKey(
     'raw',
     key as BufferSource,
     { name: 'HMAC', hash: 'SHA-1' },
     false,
-    ['sign']
+    ['sign'],
   )
 
-  const signature = await crypto.subtle.sign('HMAC', cryptoKey, data as BufferSource)
+  const signature = await crypto.subtle.sign(
+    'HMAC',
+    cryptoKey,
+    data as BufferSource,
+  )
   return new Uint8Array(signature)
 }
 
@@ -74,7 +81,7 @@ export function generateTOTPSecret(): string {
 
 export async function generateTOTP(
   secret: string,
-  timeStep: number = Math.floor(Date.now() / 1000 / 30)
+  timeStep: number = Math.floor(Date.now() / 1000 / 30),
 ): Promise<string> {
   const secretBytes = base32Decode(secret)
   const timeBuffer = new ArrayBuffer(8)
@@ -82,13 +89,13 @@ export async function generateTOTP(
   timeView.setUint32(4, timeStep, false)
 
   const hmac = await hmacSHA1(secretBytes, new Uint8Array(timeBuffer))
-  const offset = (hmac[hmac.length - 1] ?? 0) & 0x0F
+  const offset = (hmac[hmac.length - 1] ?? 0) & 0x0f
 
   const code =
-    (((hmac[offset] ?? 0 & 0x7F) << 24) |
-      ((hmac[offset + 1] ?? 0 & 0xFF) << 16) |
-      ((hmac[offset + 2] ?? 0 & 0xFF) << 8) |
-      (hmac[offset + 3] ?? 0 & 0xFF)) %
+    (((hmac[offset] ?? 0 & 0x7f) << 24) |
+      ((hmac[offset + 1] ?? 0 & 0xff) << 16) |
+      ((hmac[offset + 2] ?? 0 & 0xff) << 8) |
+      (hmac[offset + 3] ?? 0 & 0xff)) %
     1000000
 
   return code.toString().padStart(6, '0')
@@ -97,7 +104,7 @@ export async function generateTOTP(
 export async function verifyTOTP(
   token: string,
   secret: string,
-  window: number = 1
+  window: number = 1,
 ): Promise<boolean> {
   const currentTime = Math.floor(Date.now() / 1000 / 30)
 
@@ -127,7 +134,10 @@ export function parseTOTPSecrets(secretsEnv: string): Map<string, string> {
   return secrets
 }
 
-export async function verifyAnyTOTP(token: string, secretsEnv: string): Promise<boolean> {
+export async function verifyAnyTOTP(
+  token: string,
+  secretsEnv: string,
+): Promise<boolean> {
   const secrets = parseTOTPSecrets(secretsEnv)
 
   for (const [_name, secret] of secrets) {

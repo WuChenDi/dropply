@@ -31,13 +31,15 @@ retrieveRoutes.get('/retrieve/:retrievalCode', async (c) => {
       and(
         eq(sessions.retrievalCode, retrievalCode),
         eq(sessions.uploadComplete, 1),
-        withNotDeleted(sessions)
-      )
+        withNotDeleted(sessions),
+      ),
     )
     .get()
 
   if (!session) {
-    throw new HTTPException(404, { message: 'Retrieval code not found or expired' })
+    throw new HTTPException(404, {
+      message: 'Retrieval code not found or expired',
+    })
   }
 
   // 检查是否过期
@@ -57,7 +59,11 @@ retrieveRoutes.get('/retrieve/:retrievalCode', async (c) => {
   }
 
   // 创建 chest JWT
-  const chestToken = await createChestJWT(session.id, session.expiresAt, c.env.JWT_SECRET)
+  const chestToken = await createChestJWT(
+    session.id,
+    session.expiresAt,
+    c.env.JWT_SECRET,
+  )
 
   logger.info('Chest retrieved', {
     retrievalCode,
@@ -121,14 +127,16 @@ retrieveRoutes.get('/download/:fileId', async (c) => {
         eq(files.id, fileId),
         eq(files.sessionId, payload.sessionId),
         withNotDeleted(files),
-        withNotDeleted(sessions)
-      )
+        withNotDeleted(sessions),
+      ),
     )
 
   // 检查查询结果
   const result = fileWithSession?.[0]
   if (!result) {
-    throw new HTTPException(404, { message: 'File not found or session expired' })
+    throw new HTTPException(404, {
+      message: 'File not found or session expired',
+    })
   }
 
   // 检查会话是否过期

@@ -23,7 +23,7 @@ export function softDelete() {
  */
 export function withNotDeleted<T extends { isDeleted: any }>(
   table: T,
-  condition?: SQL | undefined
+  condition?: SQL | undefined,
 ) {
   return condition ? and(notDeleted(table), condition) : notDeleted(table)
 }
@@ -38,10 +38,9 @@ export function isNotExpired<T extends { expiresAt: any }>(table: T) {
 /**
  * Combine not deleted and not expired conditions
  */
-export function withNotDeletedAndNotExpired<T extends { isDeleted: any; expiresAt: any }>(
-  table: T,
-  condition?: SQL | undefined
-) {
+export function withNotDeletedAndNotExpired<
+  T extends { isDeleted: any; expiresAt: any },
+>(table: T, condition?: SQL | undefined) {
   const notDeletedCondition = notDeleted(table)
   const baseCondition = condition
     ? and(notDeletedCondition, condition)

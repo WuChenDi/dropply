@@ -1,51 +1,59 @@
-'use client';
+'use client'
 
-import { useState } from 'react';
+import { useState } from 'react'
 
 interface TOTPModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSubmit: (token: string) => Promise<void>;
-  error?: string;
-  allowCancel?: boolean;
+  isOpen: boolean
+  onClose: () => void
+  onSubmit: (token: string) => Promise<void>
+  error?: string
+  allowCancel?: boolean
 }
 
-export function TOTPModal({ isOpen, onClose, onSubmit, error, allowCancel = true }: TOTPModalProps) {
-  const [token, setToken] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
+export function TOTPModal({
+  isOpen,
+  onClose,
+  onSubmit,
+  error,
+  allowCancel = true,
+}: TOTPModalProps) {
+  const [token, setToken] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  if (!isOpen) return null;
+  if (!isOpen) return null
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
+    e.preventDefault()
+
     if (token.length !== 6) {
-      return;
+      return
     }
 
-    setIsSubmitting(true);
+    setIsSubmitting(true)
     try {
-      await onSubmit(token);
-      setToken('');
+      await onSubmit(token)
+      setToken('')
     } catch (error) {
       // Error handled by parent component
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
   const handleTokenChange = (value: string) => {
     // Only allow digits
-    const digits = value.replace(/\D/g, '').slice(0, 6);
-    setToken(digits);
-  };
+    const digits = value.replace(/\D/g, '').slice(0, 6)
+    setToken(digits)
+  }
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md mx-4">
         <div className="text-center mb-6">
           <div className="text-6xl mb-4">🔐</div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Authentication Required</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            Authentication Required
+          </h2>
           <p className="text-gray-600">
             Enter your 6-digit TOTP code from your authenticator app
           </p>
@@ -76,9 +84,11 @@ export function TOTPModal({ isOpen, onClose, onSubmit, error, allowCancel = true
               <p className="text-xs text-gray-500">
                 Check your authenticator app
               </p>
-              <p className={`text-xs ${
-                token.length === 6 ? 'text-green-600' : 'text-gray-400'
-              }`}>
+              <p
+                className={`text-xs ${
+                  token.length === 6 ? 'text-green-600' : 'text-gray-400'
+                }`}
+              >
                 {token.length}/6
               </p>
             </div>
@@ -121,5 +131,5 @@ export function TOTPModal({ isOpen, onClose, onSubmit, error, allowCancel = true
         </div>
       </div>
     </div>
-  );
+  )
 }

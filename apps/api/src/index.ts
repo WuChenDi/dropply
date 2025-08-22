@@ -59,7 +59,7 @@ app.onError((err, c) => {
         message: err.message,
         stack: isDebug ? err.stack?.split('\n') : undefined,
       },
-      err.status
+      err.status,
     )
   }
 
@@ -76,7 +76,7 @@ app.onError((err, c) => {
       message: 'Internal Server Error',
       stack: isDebug ? err.stack?.split('\n') : undefined,
     },
-    500
+    500,
   )
 })
 
@@ -94,7 +94,7 @@ app.notFound((c) => {
       statusCode: 404,
       message: 'Not Found',
     },
-    404
+    404,
   )
 })
 
@@ -105,7 +105,7 @@ export default {
   async scheduled(
     event: ScheduledEvent,
     env: CloudflareEnv,
-    ctx: ExecutionContext
+    ctx: ExecutionContext,
   ): Promise<void> {
     logger.info('Scheduled event triggered', {
       scheduledTime: event.scheduledTime,
