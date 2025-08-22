@@ -18,7 +18,8 @@
       "!**/.turbo",
       "!**/.cache",
       "!apps/api/src/database/**/*.json",
-      "!apps/api/src/database/**/*.sql"
+      "!apps/api/src/database/**/*.sql",
+      "!apps/web/src/components/ui/**/*.tsx"
     ]
   },
   "formatter": {
