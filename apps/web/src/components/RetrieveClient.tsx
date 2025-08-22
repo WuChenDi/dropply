@@ -140,13 +140,13 @@ export function RetrieveClient({ code, onBack }: RetrieveClientProps) {
   }
 
   return (
-    <div className="w-full max-w-4xl space-y-12 relative">
+    <div className="w-full max-w-4xl space-y-6 relative">
       {/* Header */}
-      <div className="text-center mb-8">
-        <GradientText className="text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-emerald-500 to-teal-500 mb-6">
+      <div className="text-center">
+        <GradientText className="text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r mb-6">
           Retrieved Content
         </GradientText>
-        <div className="mt-6">
+        <div className="flex items-center justify-center mt-6 gap-4">
           <p className="text-base md:text-lg text-muted-foreground mb-2">
             Retrieval Code:
           </p>
