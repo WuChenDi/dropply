@@ -63,7 +63,7 @@ function RetrievePageContent() {
   return (
     <div className="w-full max-w-4xl space-y-12 relative">
       <div className="text-center mb-8">
-        <GradientText className="text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r">
+        <GradientText className="text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r mb-6">
           Retrieve Files
         </GradientText>
 
