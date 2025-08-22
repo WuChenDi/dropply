@@ -13,13 +13,20 @@ import {
   Upload,
   Loader2,
 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import GradientText from '@/components/reactbits/GradientText'
+
+import {
+  cn,
+  Button,
+  Badge,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  GradientText,
+} from '@cdlab996/dropply-ui'
+
 import { usePocketChest } from '@/hooks/usePocketChest'
-import { PocketChestAPI } from '@/lib/api'
-import { cn, FileInfo } from '@/lib'
+import { PocketChestAPI, FileInfo } from '@/lib'
 
 interface FileWithContent extends FileInfo {
   content?: string
