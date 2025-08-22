@@ -4,8 +4,13 @@ import { logger as accesslog } from 'hono/logger'
 import { prettyJSON } from 'hono/pretty-json'
 import { HTTPException } from 'hono/http-exception'
 import { requestId } from 'hono/request-id'
-import { chestRoutes, retrieveRoutes } from '@/routes'
-import { cleanupExpiredContent } from '@/jobs/cleanup'
+import {
+  chestRoutes,
+  configRoutes,
+  downloadRoutes,
+  retrieveRoutes,
+} from '@/routes'
+import { cleanupExpiredContent } from '@/cron/cleanup'
 import type { CloudflareEnv } from '@/types'
 import './global'
 
@@ -22,8 +27,10 @@ app.use('*', requestId())
 app.use('*', cors())
 
 // Routes
+app.route('/api', configRoutes)
 app.route('/api', chestRoutes)
 app.route('/api', retrieveRoutes)
+app.route('/api', downloadRoutes)
 
 app.get('/', (c) => {
   return c.json({

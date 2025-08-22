@@ -45,7 +45,7 @@ const logger =
             ),
           }),
           new DailyRotateFile({
-            filename: 'logs/bc-gambling-table-%DATE%.log',
+            filename: 'logs/dropply-%DATE%.log',
             datePattern: 'YYYY-MM-DD-HH',
             zippedArchive: true,
             maxSize: '20m',

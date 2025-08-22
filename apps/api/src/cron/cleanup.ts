@@ -11,7 +11,6 @@ export interface CleanupResult {
   errors: string[]
 }
 
-// 清理过期内容（每小时运行的定时任务）
 export async function cleanupExpiredContent(
   env: CloudflareEnv,
 ): Promise<CleanupResult> {
@@ -27,25 +26,18 @@ export async function cleanupExpiredContent(
   })
 
   try {
-    // 使用临时数据库连接进行清理
+    // Create a mock context for database initialization
     const db = useDrizzle({ env } as any)
 
     if (!db) {
-      errors.push('Database connection failed')
-      return {
-        expiredSessions: 0,
-        deletedFiles: 0,
-        r2ObjectsDeleted: 0,
-        incompleteSessions: 0,
-        errors,
-      }
+      throw new Error('Database connection failed')
     }
 
     // 1. 查找过期的会话（永久会话的 expiresAt 为 NULL，所以会被排除）
     const expiredSessionsResult = await db
       ?.select()
       .from(sessions)
-      .where(and(lt(sessions.expiresAt, currentTime), withNotDeleted(sessions)))
+      .where(withNotDeleted(sessions, lt(sessions.expiresAt, currentTime)))
 
     if (!expiredSessionsResult) {
       errors.push('Failed to query expired sessions')
@@ -66,10 +58,12 @@ export async function cleanupExpiredContent(
       ?.select()
       .from(sessions)
       .where(
-        and(
-          eq(sessions.uploadComplete, 0),
-          lt(sessions.createdAt, cutoffTime),
-          withNotDeleted(sessions),
+        withNotDeleted(
+          sessions,
+          and(
+            eq(sessions.uploadComplete, 0),
+            lt(sessions.createdAt, cutoffTime),
+          ),
         ),
       )
 
@@ -109,7 +103,7 @@ export async function cleanupExpiredContent(
         const sessionFiles = await db
           ?.select()
           .from(files)
-          .where(and(eq(files.sessionId, sessionId), withNotDeleted(files)))
+          .where(withNotDeleted(files, eq(files.sessionId, sessionId)))
 
         if (!sessionFiles) {
           errors.push(`Failed to query files for session ${sessionId}`)
@@ -148,7 +142,7 @@ export async function cleanupExpiredContent(
             isDeleted: 1,
             updatedAt: new Date(),
           })
-          .where(eq(files.sessionId, sessionId))
+          .where(withNotDeleted(files, eq(files.sessionId, sessionId)))
 
         if (!filesUpdateResult) {
           errors.push(`Failed to update files for session ${sessionId}`)
@@ -163,7 +157,7 @@ export async function cleanupExpiredContent(
             isDeleted: 1,
             updatedAt: new Date(),
           })
-          .where(eq(sessions.id, sessionId))
+          .where(withNotDeleted(sessions, eq(sessions.id, sessionId)))
 
         if (!sessionUpdateResult) {
           errors.push(`Failed to update session ${sessionId}`)
