@@ -2,11 +2,10 @@
 
 import { useState } from 'react'
 import { Plus, X, FileText, Hash } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
-import { Label } from '@/components/ui/label'
-import { cn, TextItem } from '@/lib'
+
+import { cn, Button, Input, Textarea, Label } from '@cdlab996/dropply-ui'
+
+import { TextItem } from '@/lib'
 
 interface TextInputProps {
   onTextItemsChange: (items: TextItem[]) => void

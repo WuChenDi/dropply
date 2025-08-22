@@ -2,9 +2,8 @@
 
 import { useState, useRef, DragEvent } from 'react'
 import { Upload, File, X, FolderOpen, HardDrive } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { cn } from '@/lib'
+
+import { cn, Button, Badge } from '@cdlab996/dropply-ui'
 
 interface FileUploadProps {
   onFilesChange: (files: File[]) => void

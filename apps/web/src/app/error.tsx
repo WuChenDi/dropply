@@ -1,9 +1,13 @@
 'use client'
 
-import GradientText from '@/components/reactbits/GradientText'
-import ShinyText from '@/components/reactbits/ShinyText'
-import { Button } from '@/components/ui/button'
-import { Card, CardHeader, CardContent } from '@/components/ui/card'
+import {
+  GradientText,
+  ShinyText,
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+} from '@cdlab996/dropply-ui'
 
 export default function Error({ reset }: { reset: () => void }) {
   return (

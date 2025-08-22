@@ -9,18 +9,18 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 
-import GradientText from '@/components/reactbits/GradientText'
-import ShinyText from '@/components/reactbits/ShinyText'
-import SplashCursor from '@/components/reactbits/SplashCursor'
-import { Button } from '@/components/ui/button'
 import {
+  cn,
+  GradientText,
+  ShinyText,
+  SplashCursor,
+  Button,
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card'
-import { cn } from '@/lib/cn'
+} from '@cdlab996/dropply-ui'
 
 interface Task {
   id: string
