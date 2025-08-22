@@ -1,3 +1,4 @@
+// app/share/page.tsx
 'use client'
 
 import { useState, useEffect } from 'react'
@@ -11,6 +12,7 @@ import {
   CheckCircle,
   Sparkles,
   X,
+  Mail,
 } from 'lucide-react'
 
 import {
@@ -29,9 +31,11 @@ import { TextInput } from '@/components/TextInput'
 import { ExpirySelector } from '@/components/ExpirySelector'
 import { TOTPModal } from '@/components/TOTPModal'
 import { UploadProgress } from '@/components/UploadProgress'
+import { EmailShare } from '@/components/EmailShare'
 
 import { usePocketChest } from '@/hooks/usePocketChest'
 import { PocketChestAPI, TextItem, ValidityDays } from '@/lib'
+import type { ServerConfig } from '@/lib/types'
 
 export default function SharePage() {
   const [files, setFiles] = useState<File[]>([])
@@ -53,6 +57,10 @@ export default function SharePage() {
   // Config state
   const [configLoaded, setConfigLoaded] = useState(false)
   const [requireTOTP, setRequireTOTP] = useState(false)
+  const [emailShareEnabled, setEmailShareEnabled] = useState(false)
+
+  // Email share state
+  const [showEmailShare, setShowEmailShare] = useState(false)
 
   const {
     uploadWithSession,
@@ -72,8 +80,9 @@ export default function SharePage() {
     const initializeApp = async () => {
       try {
         // First, fetch server configuration
-        const config = await api.getConfig()
+        const config: ServerConfig = await api.getConfig()
         setRequireTOTP(config.requireTOTP)
+        setEmailShareEnabled(config.emailShareEnabled)
         setConfigLoaded(true)
 
         // Then initialize session based on config
@@ -357,6 +366,17 @@ export default function SharePage() {
                   Share More Files
                 </Button>
 
+                {emailShareEnabled && (
+                  <Button
+                    onClick={() => setShowEmailShare(true)}
+                    variant="outline"
+                    className="flex-1 h-12 border border-border/50 bg-background/50 backdrop-blur-sm hover:bg-background/80 rounded-xl"
+                  >
+                    <Mail className="mr-2 h-4 w-4" />
+                    Share via Email
+                  </Button>
+                )}
+
                 <Button
                   asChild
                   variant="outline"
@@ -371,6 +391,13 @@ export default function SharePage() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Email Share Modal */}
+        <EmailShare
+          retrievalCode={uploadResult}
+          isVisible={showEmailShare}
+          onClose={() => setShowEmailShare(false)}
+        />
       </div>
     )
   }

@@ -7,6 +7,9 @@ export const configRoutes = new Hono<{ Bindings: CloudflareEnv }>()
 configRoutes.get('/config', async (c) => {
   const config = {
     requireTOTP: c.env.REQUIRE_TOTP === 'true',
+    emailShareEnabled: !!(
+      c.env.RESEND_API_KEY && c.env.ENABLE_EMAIL_SHARE === 'true'
+    ),
   }
 
   return c.json(config)

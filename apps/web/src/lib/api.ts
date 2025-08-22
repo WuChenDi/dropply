@@ -10,6 +10,9 @@ import {
   UploadPart,
   MultipartUploadProgress,
   FileUploadProgress,
+  EmailShareRequest,
+  EmailShareResponse,
+  ServerConfig,
 } from './types'
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://localhost:8787'
@@ -17,7 +20,7 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://localhost:8787'
 export class PocketChestAPI {
   constructor(private baseUrl: string = API_BASE_URL) {}
 
-  async getConfig(): Promise<{ requireTOTP: boolean }> {
+  async getConfig(): Promise<ServerConfig> {
     const response = await fetch(`${this.baseUrl}/api/config`)
 
     if (!response.ok) {
@@ -808,5 +811,24 @@ export class PocketChestAPI {
     )
 
     return result
+  }
+
+  async shareViaEmail(
+    emailData: EmailShareRequest,
+  ): Promise<EmailShareResponse> {
+    const response = await fetch(`${this.baseUrl}/api/email/share`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(emailData),
+    })
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({}))
+      throw new Error(error.message || 'Failed to send email')
+    }
+
+    return response.json()
   }
 }

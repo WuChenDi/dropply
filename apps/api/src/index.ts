@@ -8,6 +8,7 @@ import {
   chestRoutes,
   configRoutes,
   downloadRoutes,
+  emailRoutes,
   retrieveRoutes,
 } from '@/routes'
 import { cleanupExpiredContent } from '@/cron/cleanup'
@@ -31,6 +32,7 @@ app.route('/api', configRoutes)
 app.route('/api', chestRoutes)
 app.route('/api', retrieveRoutes)
 app.route('/api', downloadRoutes)
+app.route('/api', emailRoutes)
 
 app.get('/', (c) => {
   return c.json({

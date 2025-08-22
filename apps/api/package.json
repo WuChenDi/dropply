@@ -26,8 +26,10 @@
   "dependencies": {
     "@hono/zod-validator": "catalog:prod",
     "@libsql/client": "catalog:prod",
+    "@react-email/components": "catalog:prod",
     "drizzle-orm": "catalog:prod",
     "hono": "catalog:prod",
+    "resend": "catalog:prod",
     "winston": "catalog:prod",
     "winston-daily-rotate-file": "catalog:prod",
     "zod": "catalog:prod"
