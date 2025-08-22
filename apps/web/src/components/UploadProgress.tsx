@@ -12,11 +12,19 @@ import {
   Loader2,
   Zap,
 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Progress } from '@/components/ui/progress'
-import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { FileUploadProgress, cn } from '@/lib'
+
+import {
+  cn,
+  Button,
+  Progress,
+  Badge,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@cdlab996/dropply-ui'
+
+import { FileUploadProgress } from '@/lib'
 
 interface UploadProgressProps {
   files: File[]

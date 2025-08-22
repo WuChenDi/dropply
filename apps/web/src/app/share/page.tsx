@@ -12,23 +12,26 @@ import {
   Sparkles,
   X,
 } from 'lucide-react'
+
+import {
+  cn,
+  GradientText,
+  ShinyText,
+  Button,
+  Card,
+  CardContent,
+  CardDescription,
+  CardTitle,
+} from '@cdlab996/dropply-ui'
+
 import { FileUpload } from '@/components/FileUpload'
 import { TextInput } from '@/components/TextInput'
 import { ExpirySelector } from '@/components/ExpirySelector'
 import { TOTPModal } from '@/components/TOTPModal'
 import { UploadProgress } from '@/components/UploadProgress'
-import { Button } from '@/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
-import GradientText from '@/components/reactbits/GradientText'
-import ShinyText from '@/components/reactbits/ShinyText'
+
 import { usePocketChest } from '@/hooks/usePocketChest'
-import { cn, PocketChestAPI, TextItem, ValidityDays } from '@/lib'
+import { PocketChestAPI, TextItem, ValidityDays } from '@/lib'
 
 export default function SharePage() {
   const [files, setFiles] = useState<File[]>([])

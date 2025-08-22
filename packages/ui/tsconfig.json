@@ -1,0 +1,12 @@
+{
+  "extends": "@cdlab996/dropply-tsconfig/utils",
+  "compilerOptions": {
+    "outDir": "dist",
+    "target": "ESNext",
+    "module": "ESNext",
+    "jsx": "react-jsx",
+    "baseUrl": ".",
+    "paths": {},
+  },
+  "include": ["src/**/*"]
+}

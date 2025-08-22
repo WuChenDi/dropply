@@ -12,6 +12,8 @@ catalogs:
     drizzle-kit: ^0.31.4
     tailwindcss: ^4
     turbo: ^2.5.6
+    tsup: ^8.5.0
+    tw-animate-css: ^1.3.7
     typescript: ^5
     ts-patch: ^3.3.0
     wrangler: ^4.31.0
@@ -21,9 +23,12 @@ catalogs:
     '@next/third-parties': 15.5.0
     drizzle-orm: ^0.44.4
     hono: ^4.9.2
+    lucide-react: ^0.540.0
+    next-themes: ^0.4.6
     next: 15.5.0
     react: ^19
     react-dom: ^19
+    tailwind-merge: ^3.3.1
     winston: ^3.17.0
     winston-daily-rotate-file: ^5.0.0
     zod: ^4.0.17

@@ -2,13 +2,13 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import { Toaster } from 'sonner'
 
+import { Aurora, Particles } from '@cdlab996/dropply-ui'
+
+import { Providers } from '@/app/providers'
 import Footer from '@/components/footer'
 import Header from '@/components/header'
-import Aurora from '@/components/reactbits/Aurora'
-import Particles from '@/components/reactbits/Particles'
 
-import { Providers } from './providers'
-import '@/app/globals.css'
+import '@cdlab996/dropply-ui/css'
 
 const inter = Inter({ subsets: ['latin'] })
 
