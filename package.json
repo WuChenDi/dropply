@@ -23,12 +23,15 @@
     "build:api": "pnpm -C apps/api run deploy",
     "build:web": "turbo run build --filter=./apps/web",
     "dev": "turbo run dev",
-    "lint": "turbo run lint",
     "check-types": "turbo run check-types",
     "clean": "bash ./scripts/clean.sh",
+    "format": "biome format . --write",
+    "lint": "biome check .",
+    "lint:fix": "biome check . --fix",
     "prepare": "turbo run build --filter=./packages/*"
   },
   "devDependencies": {
+    "@biomejs/biome": "catalog:dev",
     "turbo": "catalog:dev",
     "typescript": "catalog:dev"
   }

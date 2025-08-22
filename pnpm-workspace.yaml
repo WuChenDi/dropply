@@ -3,6 +3,7 @@ packages:
   - packages/*
 catalogs:
   dev:
+    '@biomejs/biome': ^2.2.0
     '@cloudflare/workers-types': ^4.20250821.0
     '@tailwindcss/postcss': ^4
     '@types/node': ^22
