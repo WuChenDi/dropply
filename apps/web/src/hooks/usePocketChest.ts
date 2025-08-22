@@ -1,11 +1,11 @@
 import { useState, useCallback } from 'react'
-import { PocketChestAPI } from '@/lib/api'
 import {
+  PocketChestAPI,
   TextItem,
   ValidityDays,
   MultipartUploadProgress,
   FileUploadProgress,
-} from '@/lib/types'
+} from '@/lib'
 
 export function usePocketChest() {
   const [isUploading, setIsUploading] = useState(false)

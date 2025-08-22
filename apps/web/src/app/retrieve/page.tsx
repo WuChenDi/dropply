@@ -3,7 +3,15 @@
 import { useState, useEffect, Suspense } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
+import { Loader2, CheckCircle, Info } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import GradientText from '@/components/reactbits/GradientText'
+import ShinyText from '@/components/reactbits/ShinyText'
 import { RetrieveClient } from '@/components/RetrieveClient'
+import { cn } from '@/lib'
 
 function RetrievePageContent() {
   const searchParams = useSearchParams()
@@ -53,93 +61,140 @@ function RetrievePageContent() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-green-50 via-white to-emerald-50 flex items-center justify-center p-4">
-      <div className="max-w-md w-full">
-        <div className="text-center mb-8">
-          <Link
-            href="/"
-            className="text-green-600 hover:text-green-800 text-sm"
-          >
-            ← Back to Home
-          </Link>
-          <div className="text-8xl mb-6 mt-4">📥</div>
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            Retrieve Files
-          </h1>
-          <p className="text-xl text-gray-600">
-            Enter your 6-character retrieval code to access shared files
-          </p>
+    <div className="w-full max-w-4xl space-y-12 relative">
+      <div className="text-center mb-8">
+        <GradientText className="text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r">
+          Retrieve Files
+        </GradientText>
+
+        <div className="mt-6">
+          <ShinyText
+            text="Enter your 6-character retrieval code to access shared files"
+            disabled={false}
+            speed={3}
+            className="text-base md:text-lg text-gray-600 dark:text-gray-300"
+          />
         </div>
+      </div>
 
-        <div className="bg-white rounded-2xl shadow-lg p-8">
-          <div className="space-y-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-3">
-                Retrieval Code
-              </label>
-              <input
-                type="text"
-                value={retrievalCode}
-                onChange={(e) => setRetrievalCode(e.target.value.toUpperCase())}
-                onKeyPress={handleKeyPress}
-                placeholder="A1B2C3"
-                maxLength={6}
-                className="w-full p-4 text-center text-2xl font-mono font-bold border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
-              />
-              <div className="flex justify-between items-center mt-2">
-                <p className="text-xs text-gray-500">
-                  Enter the 6-character code (letters and numbers)
-                </p>
-                <p
-                  className={`text-xs ${
-                    retrievalCode.length === 6
-                      ? 'text-green-600'
-                      : retrievalCode.length > 6
-                        ? 'text-red-600'
-                        : 'text-gray-400'
-                  }`}
-                >
-                  {retrievalCode.length}/6
-                </p>
-              </div>
+      <Card
+        className={cn(
+          'relative border-none bg-card/30 backdrop-blur-xl shadow-lg rounded-xl overflow-hidden max-w-md mx-auto',
+          'transition-all duration-300',
+        )}
+      >
+        <CardHeader className="border-b border-border/20 pb-4">
+          <div className="flex items-center gap-4">
+            <div className="p-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg">
+              <Download size={20} />
             </div>
-
-            <button
-              onClick={handleRetrieve}
-              disabled={
-                !retrievalCode.trim() || retrievalCode.trim().length !== 6
-              }
-              className="w-full py-4 bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:bg-gray-300 disabled:cursor-not-allowed font-semibold text-lg transition-colors"
-            >
-              Access Files
-            </button>
-
-            <div className="text-center">
-              <p className="text-sm text-gray-500">
-                Don't have a code?{' '}
-                <Link
-                  href="/share"
-                  className="text-green-600 hover:text-green-800 font-medium"
-                >
-                  Share files instead
-                </Link>
+            <div>
+              <CardTitle className="text-xl">Access Files</CardTitle>
+              <p className="text-sm text-muted-foreground">
+                Enter your retrieval code
               </p>
             </div>
           </div>
-        </div>
+        </CardHeader>
 
-        <div className="mt-8 text-center">
-          <div className="bg-white rounded-lg p-4 shadow-sm">
-            <h3 className="font-medium text-gray-900 mb-2">How it works:</h3>
-            <div className="text-sm text-gray-600 space-y-1">
-              <p>• Enter the 6-character code you received</p>
-              <p>• View and download all shared files</p>
-              <p>• Files expire after the set time period</p>
+        <CardContent className="p-6 space-y-6">
+          <div className="space-y-3">
+            <Label htmlFor="retrieval-code">Retrieval Code</Label>
+            <Input
+              id="retrieval-code"
+              type="text"
+              value={retrievalCode}
+              onChange={(e) => setRetrievalCode(e.target.value.toUpperCase())}
+              onKeyPress={handleKeyPress}
+              placeholder="A1B2C3"
+              maxLength={6}
+              className="text-center text-xl font-mono font-bold h-14"
+            />
+            <div className="flex justify-between items-center">
+              <p className="text-xs text-muted-foreground">
+                Enter the 6-character code (letters and numbers)
+              </p>
+              <p
+                className={cn(
+                  'text-xs font-medium',
+                  retrievalCode.length === 6
+                    ? 'text-emerald-600'
+                    : retrievalCode.length > 6
+                      ? 'text-red-600'
+                      : 'text-muted-foreground',
+                )}
+              >
+                {retrievalCode.length}/6
+                {retrievalCode.length === 6 && (
+                  <CheckCircle size={12} className="inline ml-1" />
+                )}
+              </p>
             </div>
           </div>
-        </div>
-      </div>
-    </main>
+
+          <Button
+            onClick={handleRetrieve}
+            disabled={
+              !retrievalCode.trim() || retrievalCode.trim().length !== 6
+            }
+            className={cn(
+              'w-full h-12 border-none text-white font-semibold shadow-lg rounded-xl',
+              'transition-all duration-300 hover:shadow-xl hover:scale-[1.02]',
+              'bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600',
+              'disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100',
+            )}
+          >
+            <Download className="mr-2 h-4 w-4" />
+            Access Files
+          </Button>
+
+          <div className="text-center pt-2">
+            <p className="text-sm text-muted-foreground">
+              Don't have a code?{' '}
+              <Link
+                href="/share"
+                className="text-primary hover:text-primary/80 font-medium transition-colors"
+              >
+                Share files instead
+              </Link>
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card
+        className={cn(
+          'relative border-none bg-card/30 backdrop-blur-xl shadow-lg rounded-xl overflow-hidden max-w-md mx-auto',
+          'transition-all duration-300 hover:shadow-xl',
+        )}
+      >
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/30">
+              <Info size={16} className="text-blue-600 dark:text-blue-400" />
+            </div>
+            <CardTitle className="text-lg">How it works</CardTitle>
+          </div>
+        </CardHeader>
+
+        <CardContent>
+          <div className="space-y-3 text-sm text-muted-foreground">
+            <div className="flex items-start gap-3">
+              <div className="w-1.5 h-1.5 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 mt-2 flex-shrink-0" />
+              <span>Enter the 6-character code you received</span>
+            </div>
+            <div className="flex items-start gap-3">
+              <div className="w-1.5 h-1.5 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 mt-2 flex-shrink-0" />
+              <span>View and download all shared files</span>
+            </div>
+            <div className="flex items-start gap-3">
+              <div className="w-1.5 h-1.5 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 mt-2 flex-shrink-0" />
+              <span>Files expire after the set time period</span>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   )
 }
 
@@ -147,12 +202,24 @@ export default function RetrievePage() {
   return (
     <Suspense
       fallback={
-        <main className="min-h-screen bg-gradient-to-br from-green-50 via-white to-emerald-50 flex items-center justify-center p-4">
-          <div className="text-center">
-            <div className="animate-spin text-4xl mb-4">⏳</div>
-            <p className="text-xl">Loading...</p>
-          </div>
-        </main>
+        <div className="w-full max-w-4xl space-y-12 relative flex items-center justify-center min-h-[400px]">
+          <Card className="border-none bg-card/30 backdrop-blur-xl shadow-lg max-w-md mx-auto">
+            <CardContent className="p-12 text-center">
+              <div className="space-y-6">
+                <Loader2
+                  size={48}
+                  className="mx-auto text-primary animate-spin"
+                />
+                <div>
+                  <CardTitle className="text-2xl mb-2">Loading...</CardTitle>
+                  <p className="text-muted-foreground">
+                    Please wait while we prepare the retrieve page
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       }
     >
       <RetrievePageContent />

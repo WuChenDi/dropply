@@ -15,9 +15,29 @@
     "start": "next start"
   },
   "dependencies": {
+    "@next/third-parties": "catalog:prod",
+    "@radix-ui/react-accordion": "^1.2.12",
+    "@radix-ui/react-dialog": "^1.1.15",
+    "@radix-ui/react-hover-card": "^1.1.15",
+    "@radix-ui/react-label": "^2.1.7",
+    "@radix-ui/react-popover": "^1.1.15",
+    "@radix-ui/react-progress": "^1.1.7",
+    "@radix-ui/react-scroll-area": "^1.2.10",
+    "@radix-ui/react-select": "^2.2.6",
+    "@radix-ui/react-separator": "^1.1.7",
+    "@radix-ui/react-slider": "^1.3.6",
+    "@radix-ui/react-slot": "^1.2.3",
+    "@radix-ui/react-tabs": "^1.1.13",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.540.0",
     "next": "catalog:prod",
+    "next-themes": "^0.4.6",
+    "ogl": "^1.0.11",
     "react": "catalog:prod",
-    "react-dom": "catalog:prod"
+    "react-dom": "catalog:prod",
+    "sonner": "^2.0.7",
+    "tailwind-merge": "^3.3.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "catalog:dev",
@@ -25,6 +45,7 @@
     "@types/react": "catalog:dev",
     "@types/react-dom": "catalog:dev",
     "tailwindcss": "catalog:dev",
+    "tw-animate-css": "^1.3.7",
     "typescript": "catalog:dev"
   }
 }

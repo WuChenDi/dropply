@@ -1,6 +1,7 @@
 'use client'
 
-import { ValidityDays } from '@/lib/types'
+import { Label } from '@/components/ui/label'
+import { cn, ValidityDays } from '@/lib'
 
 interface ExpirySelectorProps {
   value: ValidityDays
@@ -8,7 +9,11 @@ interface ExpirySelectorProps {
 }
 
 const expiryOptions = [
-  { value: 1 as ValidityDays, label: '1 Day', description: 'Expires tomorrow' },
+  {
+    value: 1 as ValidityDays,
+    label: '1 Day',
+    description: 'Expires tomorrow',
+  },
   {
     value: 3 as ValidityDays,
     label: '3 Days',
@@ -33,30 +38,39 @@ const expiryOptions = [
 
 export function ExpirySelector({ value, onChange }: ExpirySelectorProps) {
   return (
-    <div className="space-y-2">
-      <label className="block text-sm font-medium text-gray-700">
-        Expiry Time
-      </label>
-      <div className="grid grid-cols-1 sm:grid-cols-5 gap-2">
-        {expiryOptions.map((option) => (
-          <button
-            key={option.value}
-            onClick={() => onChange(option.value)}
-            className={`
-              p-3 rounded-lg border text-left transition-colors
-              ${
-                value === option.value
-                  ? 'border-blue-500 bg-blue-50 text-blue-700'
-                  : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-              }
-            `}
-          >
-            <div className="font-medium text-sm">{option.label}</div>
-            <div className="text-xs text-gray-500 mt-1">
-              {option.description}
-            </div>
-          </button>
-        ))}
+    <div className="space-y-4">
+      <Label className="text-sm font-medium">Expiry Time</Label>
+
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
+        {expiryOptions.map((option) => {
+          const isSelected = value === option.value
+
+          return (
+            <button
+              key={option.value}
+              onClick={() => onChange(option.value)}
+              className={cn(
+                'p-3 rounded-lg border text-center transition-all duration-200',
+                'focus:outline-none focus:ring-2 focus:ring-primary/20',
+                isSelected
+                  ? 'border-primary bg-primary text-primary-foreground shadow-sm'
+                  : 'border-border/30 bg-background/50 backdrop-blur-sm hover:border-primary/50 hover:bg-background/70',
+              )}
+            >
+              <div className="font-medium text-sm mb-1">{option.label}</div>
+              <div
+                className={cn(
+                  'text-xs',
+                  isSelected
+                    ? 'text-primary-foreground/80'
+                    : 'text-muted-foreground',
+                )}
+              >
+                {option.description}
+              </div>
+            </button>
+          )
+        })}
       </div>
     </div>
   )
