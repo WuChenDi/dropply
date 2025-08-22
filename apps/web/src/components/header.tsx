@@ -49,7 +49,7 @@ export default function Header() {
               <ThemeToggle />
               <Button asChild variant="outline" size="icon" aria-label="GitHub">
                 <Link
-                  href="https://github.com/WuChenDi/clearify"
+                  href="https://github.com/WuChenDi/dropply"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
