@@ -1,7 +1,22 @@
 'use client'
 
-import { useState } from 'react'
-import { FileUploadProgress } from '@/lib/types'
+import {
+  Upload,
+  CheckCircle,
+  AlertCircle,
+  RotateCcw,
+  X,
+  FileText,
+  File,
+  Clock,
+  Loader2,
+  Zap,
+} from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Progress } from '@/components/ui/progress'
+import { Badge } from '@/components/ui/badge'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { FileUploadProgress, cn } from '@/lib'
 
 interface UploadProgressProps {
   files: File[]
@@ -33,6 +48,7 @@ export function UploadProgress({
   if (uploadStatus === 'idle') return null
 
   const totalItems = files.length + textItems.length
+
   const formatFileSize = (bytes: number): string => {
     if (bytes === 0) return '0 Bytes'
     const k = 1024
@@ -41,41 +57,41 @@ export function UploadProgress({
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
   }
 
-  const getStatusIcon = (status: FileUploadProgress['status']): string => {
+  const getStatusIcon = (status: FileUploadProgress['status']) => {
     switch (status) {
       case 'waiting':
-        return '⏳'
+        return <Clock size={16} className="text-muted-foreground" />
       case 'starting':
-        return '🔄'
+        return <Loader2 size={16} className="text-amber-500 animate-spin" />
       case 'uploading':
-        return '📤'
+        return <Upload size={16} className="text-blue-500" />
       case 'finalizing':
-        return '⚙️'
+        return <Zap size={16} className="text-purple-500" />
       case 'completed':
-        return '✅'
+        return <CheckCircle size={16} className="text-emerald-500" />
       case 'error':
-        return '❌'
+        return <AlertCircle size={16} className="text-red-500" />
       default:
-        return '📄'
+        return <File size={16} className="text-muted-foreground" />
     }
   }
 
   const getStatusColor = (status: FileUploadProgress['status']): string => {
     switch (status) {
       case 'waiting':
-        return 'text-gray-500'
+        return 'text-muted-foreground'
       case 'starting':
-        return 'text-yellow-500'
+        return 'text-amber-500'
       case 'uploading':
         return 'text-blue-500'
       case 'finalizing':
         return 'text-purple-500'
       case 'completed':
-        return 'text-green-500'
+        return 'text-emerald-500'
       case 'error':
         return 'text-red-500'
       default:
-        return 'text-gray-500'
+        return 'text-muted-foreground'
     }
   }
 
@@ -85,248 +101,288 @@ export function UploadProgress({
     return fileProgress.find((fp) => fp.filename === filename)
   }
 
-  return (
-    <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold text-gray-900">
-          {uploadStatus === 'uploading' && '📤 Uploading...'}
-          {uploadStatus === 'success' && '✅ Upload Complete'}
-          {uploadStatus === 'error' && '❌ Upload Failed'}
-        </h3>
-        {onCancel && uploadStatus === 'uploading' && (
-          <button
-            onClick={onCancel}
-            className="text-gray-500 hover:text-gray-700 text-sm"
-          >
-            Cancel
-          </button>
-        )}
-      </div>
+  const getHeaderIcon = () => {
+    switch (uploadStatus) {
+      case 'uploading':
+        return <Upload size={20} className="text-blue-500" />
+      case 'success':
+        return <CheckCircle size={20} className="text-emerald-500" />
+      case 'error':
+        return <AlertCircle size={20} className="text-red-500" />
+      default:
+        return <Upload size={20} className="text-muted-foreground" />
+    }
+  }
 
-      {/* Progress Bar */}
-      {(uploadStatus === 'uploading' || uploadStatus === 'success') && (
-        <div className="mb-4">
-          <div className="flex justify-between text-sm text-gray-600 mb-2">
-            <span>{totalItems} item(s)</span>
-            <span>
-              {uploadStatus === 'success' ? '100%' : `${progress.percentage}%`}
-            </span>
+  const getHeaderTitle = () => {
+    switch (uploadStatus) {
+      case 'uploading':
+        return 'Uploading...'
+      case 'success':
+        return 'Upload Complete'
+      case 'error':
+        return 'Upload Failed'
+      default:
+        return 'Upload'
+    }
+  }
+
+  return (
+    <Card
+      className={cn(
+        'border-none bg-card/30 backdrop-blur-xl shadow-lg',
+        'transition-all duration-300',
+      )}
+    >
+      <CardHeader className="border-b border-border/20 pb-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            {getHeaderIcon()}
+            <CardTitle className="text-xl">{getHeaderTitle()}</CardTitle>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-2">
-            <div
-              className={`h-2 rounded-full transition-all duration-300 ${
-                uploadStatus === 'success' ? 'bg-green-500' : 'bg-blue-500'
-              }`}
-              style={{
-                width: `${uploadStatus === 'success' ? 100 : progress.percentage}%`,
-              }}
-            />
-          </div>
-          {progress.total > 0 && (
-            <div className="flex justify-between text-xs text-gray-500 mt-1">
-              <span>{formatFileSize(progress.loaded)} uploaded</span>
-              <span>{formatFileSize(progress.total)} total</span>
-            </div>
+          {onCancel && uploadStatus === 'uploading' && (
+            <Button
+              onClick={onCancel}
+              variant="ghost"
+              size="sm"
+              className="text-muted-foreground hover:text-red-500"
+            >
+              <X size={16} />
+            </Button>
           )}
         </div>
-      )}
+      </CardHeader>
 
-      {/* File List with Individual Progress */}
-      <div className="space-y-3">
-        {files.map((file, index) => {
-          const fileProgressData = getFileProgress(file.name)
-          return (
-            <div key={index} className="p-3 bg-gray-50 rounded-lg border">
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-2">
-                  <span className="text-lg">
-                    {fileProgressData
-                      ? getStatusIcon(fileProgressData.status)
-                      : uploadStatus === 'success'
-                        ? '✅'
-                        : '📄'}
-                  </span>
-                  <span className="text-sm font-medium truncate max-w-xs">
-                    {file.name}
-                  </span>
-                  <span className="text-xs text-gray-500">
-                    ({formatFileSize(file.size)})
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span
-                    className={`text-xs font-medium capitalize ${
-                      fileProgressData
-                        ? getStatusColor(fileProgressData.status)
-                        : 'text-gray-500'
-                    }`}
-                  >
-                    {fileProgressData?.status ||
-                      (uploadStatus === 'success' ? 'completed' : 'waiting')}
-                  </span>
-                  {fileProgressData && (
-                    <span className="text-xs text-gray-500">
-                      {fileProgressData.percentage}%
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              {/* Individual File Progress Bar */}
-              {fileProgressData && fileProgressData.status !== 'waiting' && (
-                <div className="mt-2">
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div
-                      className={`h-2 rounded-full transition-all duration-300 ${
-                        fileProgressData.status === 'completed'
-                          ? 'bg-green-500'
-                          : fileProgressData.status === 'uploading'
-                            ? 'bg-blue-500'
-                            : fileProgressData.status === 'starting'
-                              ? 'bg-yellow-500'
-                              : fileProgressData.status === 'finalizing'
-                                ? 'bg-purple-500'
-                                : fileProgressData.status === 'error'
-                                  ? 'bg-red-500'
-                                  : 'bg-gray-300'
-                      }`}
-                      style={{ width: `${fileProgressData.percentage}%` }}
-                    />
-                  </div>
-                  <div className="flex justify-between text-xs text-gray-400 mt-1">
-                    <span>
-                      {formatFileSize(fileProgressData.uploadedBytes)}
-                    </span>
-                    <span>{formatFileSize(fileProgressData.totalBytes)}</span>
-                  </div>
-                </div>
-              )}
+      <CardContent className="p-6 space-y-6">
+        {/* Overall Progress */}
+        {(uploadStatus === 'uploading' || uploadStatus === 'success') && (
+          <div className="space-y-3">
+            <div className="flex justify-between text-sm">
+              <span className="font-medium">{totalItems} item(s)</span>
+              <span className="text-muted-foreground">
+                {uploadStatus === 'success'
+                  ? '100%'
+                  : `${progress.percentage}%`}
+              </span>
             </div>
-          )
-        })}
 
-        {textItems.map((item, index) => {
-          const filename = item.filename || `text-${index + 1}.txt`
-          const fileProgressData = getFileProgress(filename)
-          return (
-            <div key={index} className="p-3 bg-gray-50 rounded-lg border">
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-2">
-                  <span className="text-lg">
-                    {fileProgressData
-                      ? getStatusIcon(fileProgressData.status)
-                      : uploadStatus === 'success'
-                        ? '✅'
-                        : '📝'}
-                  </span>
-                  <span className="text-sm font-medium truncate">
-                    {item.filename?.endsWith('.txt')
-                      ? item.filename.slice(0, -4)
-                      : item.filename || `Text ${index + 1}`}
-                  </span>
-                  <span className="text-xs text-gray-500">
-                    ({item.content.length} chars)
-                  </span>
-                  <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                    TEXT
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span
-                    className={`text-xs font-medium capitalize ${
-                      fileProgressData
-                        ? getStatusColor(fileProgressData.status)
-                        : 'text-gray-500'
-                    }`}
-                  >
-                    {fileProgressData?.status ||
-                      (uploadStatus === 'success' ? 'completed' : 'waiting')}
-                  </span>
-                  {fileProgressData && (
-                    <span className="text-xs text-gray-500">
-                      {fileProgressData.percentage}%
-                    </span>
-                  )}
-                </div>
+            <Progress
+              value={uploadStatus === 'success' ? 100 : progress.percentage}
+              className="h-2"
+            />
+
+            {progress.total > 0 && (
+              <div className="flex justify-between text-xs text-muted-foreground">
+                <span>{formatFileSize(progress.loaded)} uploaded</span>
+                <span>{formatFileSize(progress.total)} total</span>
               </div>
-
-              {/* Individual File Progress Bar */}
-              {fileProgressData && fileProgressData.status !== 'waiting' && (
-                <div className="mt-2">
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div
-                      className={`h-2 rounded-full transition-all duration-300 ${
-                        fileProgressData.status === 'completed'
-                          ? 'bg-green-500'
-                          : fileProgressData.status === 'uploading'
-                            ? 'bg-blue-500'
-                            : fileProgressData.status === 'starting'
-                              ? 'bg-yellow-500'
-                              : fileProgressData.status === 'finalizing'
-                                ? 'bg-purple-500'
-                                : fileProgressData.status === 'error'
-                                  ? 'bg-red-500'
-                                  : 'bg-gray-300'
-                      }`}
-                      style={{ width: `${fileProgressData.percentage}%` }}
-                    />
-                  </div>
-                  <div className="flex justify-between text-xs text-gray-400 mt-1">
-                    <span>
-                      {formatFileSize(fileProgressData.uploadedBytes)}
-                    </span>
-                    <span>{formatFileSize(fileProgressData.totalBytes)}</span>
-                  </div>
-                </div>
-              )}
-            </div>
-          )
-        })}
-      </div>
-
-      {/* Error State */}
-      {uploadStatus === 'error' && (
-        <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-          <div className="flex items-center gap-2 mb-2">
-            <span className="text-red-600">❌</span>
-            <span className="font-medium text-red-900">Upload Failed</span>
-          </div>
-          <p className="text-red-700 text-sm mb-3">
-            {error || 'An error occurred during upload'}
-          </p>
-          <div className="flex gap-2">
-            <button
-              onClick={onRetry}
-              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm font-medium"
-            >
-              🔄 Retry Upload
-            </button>
-            {onCancel && (
-              <button
-                onClick={onCancel}
-                className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 text-sm font-medium"
-              >
-                Cancel
-              </button>
             )}
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Success State */}
-      {uploadStatus === 'success' && (
-        <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
-          <div className="flex items-center gap-2">
-            <span className="text-green-600">✅</span>
-            <span className="font-medium text-green-900">
-              Upload Completed Successfully!
-            </span>
-          </div>
-          <p className="text-green-700 text-sm mt-1">
-            All {totalItems} item(s) have been uploaded and are ready to share.
-          </p>
+        {/* File List */}
+        <div className="space-y-3">
+          {files.map((file, index) => {
+            const fileProgressData = getFileProgress(file.name)
+            return (
+              <div
+                key={index}
+                className={cn(
+                  'p-4 rounded-lg border border-border/30 bg-background/30 backdrop-blur-sm',
+                  'transition-all duration-200',
+                )}
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    {fileProgressData ? (
+                      getStatusIcon(fileProgressData.status)
+                    ) : uploadStatus === 'success' ? (
+                      <CheckCircle size={16} className="text-emerald-500" />
+                    ) : (
+                      <File size={16} className="text-muted-foreground" />
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium truncate">
+                        {file.name}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {formatFileSize(file.size)}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <Badge
+                      variant="secondary"
+                      className={cn(
+                        'text-xs capitalize',
+                        fileProgressData
+                          ? getStatusColor(fileProgressData.status)
+                          : 'text-muted-foreground',
+                      )}
+                    >
+                      {fileProgressData?.status ||
+                        (uploadStatus === 'success' ? 'completed' : 'waiting')}
+                    </Badge>
+                    {fileProgressData && (
+                      <span className="text-xs text-muted-foreground font-mono">
+                        {fileProgressData.percentage}%
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Individual File Progress */}
+                {fileProgressData && fileProgressData.status !== 'waiting' && (
+                  <div className="space-y-2">
+                    <Progress
+                      value={fileProgressData.percentage}
+                      className="h-1.5"
+                    />
+                    <div className="flex justify-between text-xs text-muted-foreground">
+                      <span>
+                        {formatFileSize(fileProgressData.uploadedBytes)}
+                      </span>
+                      <span>{formatFileSize(fileProgressData.totalBytes)}</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )
+          })}
+
+          {textItems.map((item, index) => {
+            const filename = item.filename || `text-${index + 1}.txt`
+            const fileProgressData = getFileProgress(filename)
+            return (
+              <div
+                key={index}
+                className={cn(
+                  'p-4 rounded-lg border border-border/30 bg-background/30 backdrop-blur-sm',
+                  'transition-all duration-200',
+                )}
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    {fileProgressData ? (
+                      getStatusIcon(fileProgressData.status)
+                    ) : uploadStatus === 'success' ? (
+                      <CheckCircle size={16} className="text-emerald-500" />
+                    ) : (
+                      <FileText size={16} className="text-muted-foreground" />
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium truncate">
+                        {item.filename?.endsWith('.txt')
+                          ? item.filename.slice(0, -4)
+                          : item.filename || `Text ${index + 1}`}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {item.content.length} characters
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <Badge variant="outline" className="text-xs">
+                      TEXT
+                    </Badge>
+                    <Badge
+                      variant="secondary"
+                      className={cn(
+                        'text-xs capitalize',
+                        fileProgressData
+                          ? getStatusColor(fileProgressData.status)
+                          : 'text-muted-foreground',
+                      )}
+                    >
+                      {fileProgressData?.status ||
+                        (uploadStatus === 'success' ? 'completed' : 'waiting')}
+                    </Badge>
+                    {fileProgressData && (
+                      <span className="text-xs text-muted-foreground font-mono">
+                        {fileProgressData.percentage}%
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Individual File Progress */}
+                {fileProgressData && fileProgressData.status !== 'waiting' && (
+                  <div className="space-y-2">
+                    <Progress
+                      value={fileProgressData.percentage}
+                      className="h-1.5"
+                    />
+                    <div className="flex justify-between text-xs text-muted-foreground">
+                      <span>
+                        {formatFileSize(fileProgressData.uploadedBytes)}
+                      </span>
+                      <span>{formatFileSize(fileProgressData.totalBytes)}</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )
+          })}
         </div>
-      )}
-    </div>
+
+        {/* Error State */}
+        {uploadStatus === 'error' && (
+          <div
+            className={cn(
+              'p-4 rounded-lg border',
+              'bg-red-50/80 border-red-200/50 dark:bg-red-950/30 dark:border-red-800/50',
+            )}
+          >
+            <div className="flex items-center gap-2 mb-3">
+              <AlertCircle size={16} className="text-red-500" />
+              <span className="font-medium text-red-900 dark:text-red-100">
+                Upload Failed
+              </span>
+            </div>
+            <p className="text-red-700 dark:text-red-300 text-sm mb-4">
+              {error || 'An error occurred during upload'}
+            </p>
+            <div className="flex gap-2">
+              <Button
+                onClick={onRetry}
+                size="sm"
+                className="bg-red-600 hover:bg-red-700 text-white"
+              >
+                <RotateCcw size={14} className="mr-2" />
+                Retry Upload
+              </Button>
+              {onCancel && (
+                <Button onClick={onCancel} variant="outline" size="sm">
+                  Cancel
+                </Button>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Success State */}
+        {uploadStatus === 'success' && (
+          <div
+            className={cn(
+              'p-4 rounded-lg border',
+              'bg-emerald-50/80 border-emerald-200/50 dark:bg-emerald-950/30 dark:border-emerald-800/50',
+            )}
+          >
+            <div className="flex items-center gap-2 mb-2">
+              <CheckCircle size={16} className="text-emerald-500" />
+              <span className="font-medium text-emerald-900 dark:text-emerald-100">
+                Upload Completed Successfully!
+              </span>
+            </div>
+            <p className="text-emerald-700 dark:text-emerald-300 text-sm">
+              All {totalItems} item(s) have been uploaded and are ready to
+              share.
+            </p>
+          </div>
+        )}
+      </CardContent>
+    </Card>
   )
 }

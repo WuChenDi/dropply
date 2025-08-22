@@ -13,10 +13,12 @@ catalogs:
     tailwindcss: ^4
     turbo: ^2.5.6
     typescript: ^5
+    ts-patch: ^3.3.0
     wrangler: ^4.31.0
   prod:
     '@hono/zod-validator': ^0.7.2
     '@libsql/client': ^0.15.12
+    '@next/third-parties': 15.5.0
     drizzle-orm: ^0.44.4
     hono: ^4.9.2
     next: 15.5.0
