@@ -15,7 +15,7 @@ import {
   ServerConfig,
 } from './types'
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://localhost:8787'
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://localhost:3000'
 
 export class PocketChestAPI {
   constructor(private baseUrl: string = API_BASE_URL) {}
