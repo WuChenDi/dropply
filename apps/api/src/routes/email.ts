@@ -183,14 +183,67 @@ function generateEmailTemplate(
     .title { color: #333; font-size: 24px; font-weight: 600; margin: 0; }
     .content { background: #f8f9fa; border-radius: 12px; padding: 30px; margin: 20px 0; }
     .code-section { background: linear-gradient(135deg, #4C00FF, #6366f1); color: white; padding: 25px; border-radius: 12px; text-align: center; margin: 25px 0; }
-    .code { font-size: 32px; font-weight: bold; letter-spacing: 4px; margin: 10px 0; }
-    .button { display: inline-block; background: #4C00FF; color: white !important; padding: 16px 32px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; margin: 20px 0; transition: background-color 0.3s ease; }
-    .button:hover { background: #3d00cc; }
+    .code { font-size: 32px; font-weight: bold; letter-spacing: 4px; margin: 10px 0; font-family: 'Courier New', monospace; }
+    .retrieve-url { 
+      background: rgba(255, 255, 255, 0.15); 
+      padding: 12px 16px; 
+      border-radius: 8px; 
+      margin: 15px 0; 
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    .retrieve-url a { 
+      color: #ffffff !important; 
+      text-decoration: underline; 
+      font-weight: 600;
+      word-break: break-all;
+      font-size: 16px;
+    }
+    .retrieve-url a:hover { color: #e0e0e0 !important; }
+    .retrieve-instructions { 
+      margin: 15px 0 0 0; 
+      opacity: 0.9; 
+      font-size: 14px;
+      line-height: 1.4;
+    }
+    .button { 
+      display: inline-block; 
+      background: #4C00FF; 
+      color: white !important; 
+      padding: 16px 32px; 
+      text-decoration: none; 
+      border-radius: 8px; 
+      font-weight: 600; 
+      font-size: 16px; 
+      margin: 20px 0; 
+      transition: background-color 0.3s ease;
+      box-shadow: 0 4px 12px rgba(76, 0, 255, 0.3);
+    }
+    .button:hover { background: #3d00cc; transform: translateY(-1px); box-shadow: 0 6px 16px rgba(76, 0, 255, 0.4); }
     .file-list { background: white; border-radius: 8px; padding: 20px; margin: 20px 0; border-left: 4px solid #4C00FF; }
-    .file-info { margin: 10px 0; color: #666; }
+    .file-info { margin: 10px 0; color: #666; display: flex; align-items: center; }
+    .file-icon { margin-right: 8px; font-size: 16px; }
     .message-box { background: #e3f2fd; border-left: 4px solid #2196f3; padding: 15px; margin: 20px 0; border-radius: 4px; }
     .footer { text-align: center; color: #666; font-size: 14px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; }
-    .expiry-warning { background: #fff3cd; border: 1px solid #ffeaa7; color: #856404; padding: 12px; border-radius: 6px; margin: 15px 0; }
+    .expiry-warning { 
+      background: #fff3cd; 
+      border: 1px solid #ffeaa7; 
+      color: #856404; 
+      padding: 12px; 
+      border-radius: 6px; 
+      margin: 15px 0;
+      display: flex;
+      align-items: center;
+    }
+    .expiry-warning .icon { margin-right: 8px; font-size: 16px; }
+    
+    /* 移动端适配 */
+    @media (max-width: 480px) {
+      .container { padding: 15px; }
+      .content { padding: 20px; }
+      .code { font-size: 24px; letter-spacing: 2px; }
+      .button { padding: 14px 24px; font-size: 14px; }
+      .retrieve-url a { font-size: 14px; }
+    }
   </style>
 </head>
 <body>
@@ -214,25 +267,32 @@ function generateEmailTemplate(
             ?.slice(0, 5)
             .map(
               (file) =>
-                `<div class="file-info">📄 ${file.originalFilename} (${formatFileSize(file.fileSize)})</div>`,
+                `<div class="file-info"><span class="file-icon">📄</span><span>${file.originalFilename} (${formatFileSize(file.fileSize)})</span></div>`,
             )
             .join('') || ''
         }
-        ${fileCount > 5 ? `<div class="file-info">... and ${fileCount - 5} more file${fileCount - 5 !== 1 ? 's' : ''}</div>` : ''}
+        ${fileCount > 5 ? `<div class="file-info"><span class="file-icon">📁</span><span>... and ${fileCount - 5} more file${fileCount - 5 !== 1 ? 's' : ''}</span></div>` : ''}
       </div>
 
       <div class="code-section">
         <h3 style="margin: 0 0 10px 0;">Retrieval Code</h3>
         <div class="code">${retrievalCode}</div>
-        <p style="margin: 10px 0 0 0; opacity: 0.9;">Enter this code at <a href="${baseUrl}/retrieve">${baseUrl}/retrieve</a></p>
+        
+        <div class="retrieve-instructions">
+          Enter this code at:
+        </div>
+        <div class="retrieve-url">
+          <a href="${baseUrl}/retrieve" target="_blank">${baseUrl}/retrieve</a>
+        </div>
       </div>
 
       <div style="text-align: center;">
-        <a href="${retrieveUrl}" class="button">Download Files Now</a>
+        <a href="${retrieveUrl}" class="button" target="_blank">Download Files Now</a>
       </div>
 
       <div class="expiry-warning">
-        ⏰ ${getExpiryText()}
+        <span class="icon">⏰</span>
+        <span>${getExpiryText()}</span>
       </div>
     </div>
 
@@ -240,7 +300,7 @@ function generateEmailTemplate(
       <p>This email was sent by <strong>Dropply</strong> - a secure file sharing service.</p>
       <p>Files are encrypted and automatically deleted after expiration. No account required.</p>
       <p style="margin-top: 15px; font-size: 12px; color: #999;">
-        If you didn't expect this email, you can safely ignore it.
+        If you didn't expect this email, you can safely ignore it. Need help? Visit our support page.
       </p>
     </div>
   </div>
