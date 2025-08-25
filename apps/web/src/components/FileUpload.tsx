@@ -1,9 +1,11 @@
 'use client'
 
-import { useState, useRef, DragEvent } from 'react'
-import { Upload, File, X, FolderOpen, HardDrive } from 'lucide-react'
+import { useCallback } from 'react'
+import { useDropzone } from 'react-dropzone'
+import { Upload, X, FolderOpen, HardDrive } from 'lucide-react'
 
 import { cn, Button, Badge } from '@cdlab996/dropply-ui'
+import { getFileIcon } from '@/lib'
 
 interface FileUploadProps {
   onFilesChange: (files: File[]) => void
@@ -11,39 +13,19 @@ interface FileUploadProps {
 }
 
 export function FileUpload({ onFilesChange, files }: FileUploadProps) {
-  const [isDragOver, setIsDragOver] = useState(false)
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  const onDrop = useCallback(
+    (acceptedFiles: File[]) => {
+      const newFiles = [...files, ...acceptedFiles]
+      onFilesChange(newFiles)
+    },
+    [files, onFilesChange],
+  )
 
-  const handleDragEnter = (e: DragEvent) => {
-    e.preventDefault()
-    setIsDragOver(true)
-  }
-
-  const handleDragLeave = (e: DragEvent) => {
-    e.preventDefault()
-    if (e.currentTarget === e.target) {
-      setIsDragOver(false)
-    }
-  }
-
-  const handleDragOver = (e: DragEvent) => {
-    e.preventDefault()
-  }
-
-  const handleDrop = (e: DragEvent) => {
-    e.preventDefault()
-    setIsDragOver(false)
-
-    const droppedFiles = Array.from(e.dataTransfer.files)
-    const newFiles = [...files, ...droppedFiles]
-    onFilesChange(newFiles)
-  }
-
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFiles = Array.from(e.target.files || [])
-    const newFiles = [...files, ...selectedFiles]
-    onFilesChange(newFiles)
-  }
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    multiple: true,
+    noClick: false,
+  })
 
   const removeFile = (index: number) => {
     const newFiles = files.filter((_, i) => i !== index)
@@ -58,47 +40,39 @@ export function FileUpload({ onFilesChange, files }: FileUploadProps) {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
   }
 
-  const getFileIcon = (fileName: string) => {
-    const extension = fileName.split('.').pop()?.toLowerCase()
-
-    // You could expand this with more specific icons based on file type
-    return <File size={16} className="text-purple-500" />
-  }
-
   return (
     <div className="w-full space-y-4">
-      {/* Drop Zone */}
       <div
+        {...getRootProps()}
         className={cn(
-          'border-2 border-dashed rounded-lg p-8 text-center transition-all duration-200 cursor-pointer',
-          'hover:bg-background/50',
-          isDragOver
-            ? 'border-primary bg-primary/5 scale-[1.02]'
-            : 'border-border/40 hover:border-border/60',
+          'border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-all duration-300 group',
+          'border-border/40',
+          'hover:border-blue-500/80 hover:bg-blue-500/10',
+          isDragActive && 'border-blue-500/80 bg-blue-500/10 scale-[1.02]',
         )}
-        onDragEnter={handleDragEnter}
-        onDragLeave={handleDragLeave}
-        onDragOver={handleDragOver}
-        onDrop={handleDrop}
-        onClick={() => fileInputRef.current?.click()}
       >
+        <input {...getInputProps()} />
         <div className="space-y-4">
           <div
             className={cn(
-              'mx-auto w-16 h-16 rounded-full flex items-center justify-center transition-all duration-200',
-              isDragOver ? 'bg-primary/10 scale-110' : 'bg-muted/50',
+              'mx-auto w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300',
+              'bg-muted/50 group-hover:bg-blue-500/20 group-hover:scale-110',
+              isDragActive && 'bg-blue-500/20 scale-110',
             )}
           >
-            {isDragOver ? (
-              <Upload size={24} className="text-primary" />
+            {isDragActive ? (
+              <Upload size={24} className="text-blue-500" />
             ) : (
-              <FolderOpen size={24} className="text-muted-foreground" />
+              <FolderOpen
+                size={24}
+                className="text-muted-foreground group-hover:text-blue-400 transition-colors duration-300"
+              />
             )}
           </div>
 
           <div>
             <p className="text-lg font-medium text-foreground mb-1">
-              {isDragOver
+              {isDragActive
                 ? 'Drop files here'
                 : 'Drop files here or click to browse'}
             </p>
@@ -107,17 +81,8 @@ export function FileUpload({ onFilesChange, files }: FileUploadProps) {
             </p>
           </div>
         </div>
-
-        <input
-          ref={fileInputRef}
-          type="file"
-          multiple
-          className="hidden"
-          onChange={handleFileSelect}
-        />
       </div>
 
-      {/* Selected Files */}
       {files.length > 0 && (
         <div className="space-y-4">
           <div className="flex items-center gap-2">

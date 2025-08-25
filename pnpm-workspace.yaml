@@ -29,6 +29,7 @@ catalogs:
     next: 15.5.0
     react: ^19
     react-dom: ^19
+    react-dropzone: ^14.3.8
     resend: ^6.0.1
     tailwind-merge: ^3.3.1
     winston: ^3.17.0

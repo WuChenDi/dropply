@@ -22,6 +22,7 @@
     "next": "catalog:prod",
     "react": "catalog:prod",
     "react-dom": "catalog:prod",
+    "react-dropzone": "catalog:prod",
     "sonner": "^2.0.7"
   },
   "devDependencies": {
