@@ -169,6 +169,9 @@ export class PocketChestAPI {
         if (fileIndex >= smallFiles.length) return
 
         const file = smallFiles[fileIndex++]
+
+        if (!file) return
+
         activeUploads++
 
         // Mark file as starting
@@ -229,7 +232,7 @@ export class PocketChestAPI {
 
           // Mark file as completed
           const fileProgress = fileProgressMap.get(file.name)
-          if (fileProgress) {
+          if (fileProgress && result.uploadedFiles[0]) {
             fileProgress.fileId = result.uploadedFiles[0].fileId
             fileProgress.status = 'completed'
             fileProgress.uploadedBytes = fileProgress.totalBytes
