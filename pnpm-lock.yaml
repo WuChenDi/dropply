@@ -145,6 +145,9 @@ importers:
         specifier: catalog:prod
         version: 4.0.17
     devDependencies:
+      '@cdlab996/dropply-tsconfig':
+        specifier: workspace:*
+        version: link:../../packages/tsconfig
       '@cloudflare/workers-types':
         specifier: catalog:dev
         version: 4.20250822.0
@@ -188,6 +191,9 @@ importers:
         specifier: ^2.0.7
         version: 2.0.7(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
     devDependencies:
+      '@cdlab996/dropply-tsconfig':
+        specifier: workspace:*
+        version: link:../../packages/tsconfig
       '@tailwindcss/postcss':
         specifier: catalog:dev
         version: 4.1.12

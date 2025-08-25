@@ -26,6 +26,7 @@
     "sonner": "^2.0.7"
   },
   "devDependencies": {
+    "@cdlab996/dropply-tsconfig": "workspace:*",
     "@tailwindcss/postcss": "catalog:dev",
     "@types/node": "catalog:dev",
     "@types/react": "catalog:dev",

@@ -35,6 +35,7 @@
     "zod": "catalog:prod"
   },
   "devDependencies": {
+    "@cdlab996/dropply-tsconfig": "workspace:*",
     "@cloudflare/workers-types": "catalog:dev",
     "@types/node": "catalog:dev",
     "drizzle-kit": "catalog:dev",
