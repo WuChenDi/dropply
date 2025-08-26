@@ -15,7 +15,7 @@ import type { CloudflareEnv } from '@/types'
 
 export const downloadRoutes = new Hono<{ Bindings: CloudflareEnv }>()
 
-// GET /download/:fileId - 下载文件
+// GET /download/:fileId - Download file
 downloadRoutes.get(
   '/download/:fileId',
   zValidator('param', fileIdParamSchema),
@@ -26,7 +26,7 @@ downloadRoutes.get(
     const { token: tokenFromQuery, filename: filenameFromQuery } =
       c.req.valid('query')
 
-    // 提取令牌
+    // Extract token
     const authHeader = c.req.header('Authorization')
 
     let token: string
@@ -57,7 +57,7 @@ downloadRoutes.get(
       )
     }
 
-    // 获取文件元数据并验证会话仍然有效
+    // Get file metadata and validate session is still valid
     const fileWithSession = await db
       ?.select()
       .from(files)
@@ -71,7 +71,7 @@ downloadRoutes.get(
         ),
       )
 
-    // 检查查询结果
+    // Check query result
     const result = fileWithSession?.[0]
     if (!result) {
       return c.json<ApiResponse>(
@@ -83,7 +83,7 @@ downloadRoutes.get(
       )
     }
 
-    // 检查会话是否过期
+    // Check if session is expired
     if (result.sessions.expiresAt && result.sessions.expiresAt < new Date()) {
       return c.json<ApiResponse>(
         {
@@ -94,7 +94,7 @@ downloadRoutes.get(
       )
     }
 
-    // 从R2获取文件
+    // Get file from R2
     const r2Object = await c.env.R2_STORAGE.get(
       `${payload.sessionId}/${fileId}`,
     )
@@ -108,7 +108,7 @@ downloadRoutes.get(
       )
     }
 
-    // 使用查询参数中的文件名，否则使用原始文件名
+    // Use filename from query param if provided, otherwise use original filename
     const downloadFilename = filenameFromQuery || result.files.originalFilename
 
     logger.info('File downloaded', {
@@ -117,7 +117,7 @@ downloadRoutes.get(
       filename: downloadFilename,
     })
 
-    // 返回文件
+    // Return file
     return new Response(r2Object.body, {
       headers: {
         'Content-Type': result.files.mimeType,

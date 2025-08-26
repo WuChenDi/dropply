@@ -1,4 +1,3 @@
-// TOTP 工具函数
 function base32Encode(buffer: Uint8Array): string {
   const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567'
   let result = ''

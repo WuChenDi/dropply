@@ -17,7 +17,6 @@ const trackingFields = {
   isDeleted: integer('is_deleted').notNull().default(0),
 }
 
-// 会话表
 export const sessions = sqliteTable(
   'sessions',
   {
@@ -33,7 +32,6 @@ export const sessions = sqliteTable(
   ],
 )
 
-// 文件表
 export const files = sqliteTable(
   'files',
   {

@@ -36,7 +36,7 @@ import type { CloudflareEnv } from '@/types'
 
 export const chestRoutes = new Hono<{ Bindings: CloudflareEnv }>()
 
-// POST /chest - 创建新的 chest
+// POST /chest - Create new chest
 chestRoutes.post(
   '/chest',
   zValidator('json', createChestRequestSchema),
@@ -47,7 +47,7 @@ chestRoutes.post(
     const requireTOTP = c.env.REQUIRE_TOTP === 'true'
     const { totpToken } = c.req.valid('json')
 
-    // TOTP 验证
+    // TOTP verification
     if (requireTOTP) {
       if (!totpToken) {
         return c.json<ApiResponse>(
@@ -95,7 +95,7 @@ chestRoutes.post(
       const response: CreateChestResponse = {
         sessionId,
         uploadToken,
-        expiresIn: 86400, // 24小时
+        expiresIn: 86400, // 24 hours
       }
 
       return c.json<ApiResponse<CreateChestResponse>>({
@@ -126,7 +126,7 @@ chestRoutes.post(
   },
 )
 
-// POST /chest/:sessionId/upload - 上传文件
+// POST /chest/:sessionId/upload - Upload files
 chestRoutes.post(
   '/chest/:sessionId/upload',
   zValidator('param', sessionIdParamSchema),
@@ -135,7 +135,7 @@ chestRoutes.post(
     const db = useDrizzle(c)
     const { sessionId } = c.req.valid('param')
 
-    // 验证JWT令牌
+    // Verify JWT token
     const authHeader = c.req.header('Authorization')
     if (!authHeader?.startsWith('Bearer ')) {
       return c.json<ApiResponse>(
@@ -171,7 +171,7 @@ chestRoutes.post(
       )
     }
 
-    // 检查会话是否存在且未完成
+    // Check if session exists and is not completed
     const session = await db
       ?.select()
       .from(sessions)
@@ -193,7 +193,7 @@ chestRoutes.post(
       )
     }
 
-    // 解析表单数据
+    // Parse form data
     const formData = await c.req.formData()
     const uploadedFiles: Array<{
       fileId: string
@@ -203,7 +203,7 @@ chestRoutes.post(
     const r2Operations: Promise<any>[] = []
     const fileInserts: any[] = []
 
-    // 处理文件上传
+    // Process file uploads
     for (const [key, value] of formData.entries()) {
       if (key === 'files' && value instanceof File) {
         const fileId = generateUUID()
@@ -211,12 +211,12 @@ chestRoutes.post(
         const mimeType = value.type || 'application/octet-stream'
         const fileSize = value.size
 
-        // 队列化R2操作
+        // Queue R2 operations
         r2Operations.push(
           c.env.R2_STORAGE.put(`${sessionId}/${fileId}`, value.stream()),
         )
 
-        // 队列化数据库操作
+        // Queue database operations
         fileInserts.push({
           id: fileId,
           sessionId,
@@ -231,7 +231,7 @@ chestRoutes.post(
       }
     }
 
-    // 处理文本项
+    // Process text items
     const textItems = formData.getAll('textItems')
     for (const textItem of textItems) {
       if (typeof textItem === 'string') {
@@ -261,7 +261,7 @@ chestRoutes.post(
     }
 
     try {
-      // 并行执行所有操作
+      // Execute all operations in parallel
       await Promise.all([
         Promise.all(r2Operations),
         fileInserts.length > 0
@@ -300,7 +300,7 @@ chestRoutes.post(
   },
 )
 
-// POST /chest/:sessionId/complete - 完成上传并生成检索码
+// POST /chest/:sessionId/complete - Complete upload and generate retrieval code
 chestRoutes.post(
   '/chest/:sessionId/complete',
   zValidator('param', sessionIdParamSchema),
@@ -347,7 +347,7 @@ chestRoutes.post(
       )
     }
 
-    // 验证文件所有权
+    // Verify file ownership
     const fileCount = await db
       ?.select()
       .from(files)
@@ -367,7 +367,7 @@ chestRoutes.post(
     const expiryDate = calculateExpiry(validityDays)
 
     try {
-      // 更新会话
+      // Update session
       await db
         ?.update(sessions)
         .set({
@@ -418,7 +418,7 @@ chestRoutes.post(
   },
 )
 
-// POST /chest/:sessionId/multipart/create - 创建分片上传
+// POST /chest/:sessionId/multipart/create - Create multipart upload
 chestRoutes.post(
   '/chest/:sessionId/multipart/create',
   zValidator('param', sessionIdParamSchema),
@@ -429,7 +429,7 @@ chestRoutes.post(
     const { sessionId } = c.req.valid('param')
     const { filename, mimeType, fileSize } = c.req.valid('json')
 
-    // 验证JWT令牌
+    // Validate JWT token
     const authHeader = c.req.header('Authorization')
     if (!authHeader?.startsWith('Bearer ')) {
       return c.json<ApiResponse>(
@@ -465,7 +465,7 @@ chestRoutes.post(
       )
     }
 
-    // 检查会话存在且未完成
+    // Check if session exists and is not completed
     const session = await db
       ?.select()
       .from(sessions)
@@ -490,12 +490,12 @@ chestRoutes.post(
     const fileId = generateUUID()
 
     try {
-      // 在R2创建分片上传
+      // Create multipart upload in R2
       const multipartUpload = await c.env.R2_STORAGE.createMultipartUpload(
         `${sessionId}/${fileId}`,
       )
 
-      // 创建分片JWT（48小时有效期）
+      // Create multipart JWT (valid for 48 hours)
       const multipartToken = await createMultipartJWT(
         sessionId,
         fileId,
@@ -540,7 +540,7 @@ chestRoutes.post(
   },
 )
 
-// PUT /chest/:sessionId/multipart/:fileId/part/:partNumber - 上传分片
+// PUT /chest/:sessionId/multipart/:fileId/part/:partNumber - Upload part
 chestRoutes.put(
   '/chest/:sessionId/multipart/:fileId/part/:partNumber',
   zValidator(
@@ -551,7 +551,7 @@ chestRoutes.put(
     const requestId = c.get('requestId')
     const { sessionId, fileId, partNumber } = c.req.valid('param')
 
-    // 验证分片JWT令牌
+    // Validate part JWT token
     const authHeader = c.req.header('Authorization')
     if (!authHeader?.startsWith('Bearer ')) {
       return c.json<ApiResponse>(
@@ -587,7 +587,7 @@ chestRoutes.put(
       )
     }
 
-    // 获取请求体
+    // Get request body
     const body = await c.req.arrayBuffer()
     if (!body || body.byteLength === 0) {
       return c.json<ApiResponse>(
@@ -600,7 +600,7 @@ chestRoutes.put(
     }
 
     try {
-      // 恢复分片上传并上传分片
+      // Resume multipart upload and upload part
       const multipartUpload = c.env.R2_STORAGE.resumeMultipartUpload(
         `${sessionId}/${fileId}`,
         payload.uploadId,
@@ -644,7 +644,7 @@ chestRoutes.put(
   },
 )
 
-// POST /chest/:sessionId/multipart/:fileId/complete - 完成分片上传
+// POST /chest/:sessionId/multipart/:fileId/complete - Complete multipart upload
 chestRoutes.post(
   '/chest/:sessionId/multipart/:fileId/complete',
   zValidator('param', sessionIdParamSchema.merge(fileIdParamSchema)),
@@ -655,7 +655,7 @@ chestRoutes.post(
     const { sessionId, fileId } = c.req.valid('param')
     const { parts } = c.req.valid('json')
 
-    // 验证分片JWT令牌
+    // Validate part JWT token
     const authHeader = c.req.header('Authorization')
     if (!authHeader?.startsWith('Bearer ')) {
       return c.json<ApiResponse>(
@@ -691,18 +691,18 @@ chestRoutes.post(
       )
     }
 
-    // 按分片号排序
+    // Sort parts by part number
     const sortedParts = parts.sort((a, b) => a.partNumber - b.partNumber)
 
     try {
-      // 恢复分片上传并完成
+      // Resume multipart upload and complete
       const multipartUpload = c.env.R2_STORAGE.resumeMultipartUpload(
         `${sessionId}/${fileId}`,
         payload.uploadId,
       )
       await multipartUpload.complete(sortedParts)
 
-      // 成功完成后插入文件记录到数据库
+      // Insert file record into database after successful completion
       await db?.insert(files).values({
         id: fileId,
         sessionId,

@@ -33,7 +33,7 @@ export async function cleanupExpiredContent(
       throw new Error('Database connection failed')
     }
 
-    // 1. 查找过期的会话（永久会话的 expiresAt 为 NULL，所以会被排除）
+    // 1. Find expired sessions (permanent sessions with expiresAt = NULL are excluded)
     const expiredSessionsResult = await db
       ?.select()
       .from(sessions)
@@ -52,7 +52,7 @@ export async function cleanupExpiredContent(
 
     logger.info(`Found ${expiredSessionsResult.length} expired sessions`)
 
-    // 2. 查找48小时前创建的未完成会话（匹配分片JWT有效期）
+    // 2. Find incomplete sessions created 48 hours ago (matching shard JWT validity period)
     const cutoffTime = new Date(Date.now() - 48 * 60 * 60 * 1000)
     const incompleteSessionsResult = await db
       ?.select()
@@ -82,7 +82,7 @@ export async function cleanupExpiredContent(
       `Found ${incompleteSessionsResult.length} incomplete sessions (>48h old)`,
     )
 
-    // 合并过期和未完成的会话进行清理
+    // Merge expired and incomplete sessions for cleanup
     const allSessionsToCleanup = [
       ...expiredSessionsResult.map((s) => ({ id: s.id, reason: 'expired' })),
       ...incompleteSessionsResult.map((s) => ({
@@ -93,13 +93,13 @@ export async function cleanupExpiredContent(
 
     logger.info(`Total sessions to cleanup: ${allSessionsToCleanup.length}`)
 
-    // 处理每个会话
+    // Process each session
     for (const session of allSessionsToCleanup) {
       const sessionId = session.id
       const reason = session.reason
 
       try {
-        // 3. 获取文件数量用于日志记录
+        // 3. Get file count for logging
         const sessionFiles = await db
           ?.select()
           .from(files)
@@ -113,7 +113,7 @@ export async function cleanupExpiredContent(
         const fileCount = sessionFiles.length
         logger.info(`Session ${sessionId} (${reason}) has ${fileCount} files`)
 
-        // 4. 删除R2中的所有对象
+        // 4. Delete all objects in R2
         try {
           const listResult = await env.R2_STORAGE.list({
             prefix: `${sessionId}/`,
@@ -135,7 +135,7 @@ export async function cleanupExpiredContent(
           )
         }
 
-        // 5. 软删除数据库记录（先删除文件，再删除会话）
+        // 5. Soft delete database records (delete files first, then session)
         const filesUpdateResult = await db
           ?.update(files)
           .set({

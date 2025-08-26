@@ -4,7 +4,7 @@ import type {
   MultipartJWTPayload,
 } from '@/types'
 
-// 安全编码UTF-8字符串为base64url
+// Safely encode UTF-8 string to base64url
 function base64UrlEncode(str: string): string {
   const encoder = new TextEncoder()
   const bytes = encoder.encode(str)
@@ -12,7 +12,7 @@ function base64UrlEncode(str: string): string {
   return base64.replace(/[=]/g, '').replace(/\+/g, '-').replace(/\//g, '_')
 }
 
-// 安全解码base64url为UTF-8字符串
+// Safely decode base64url to UTF-8 string
 function base64UrlDecode(str: string): string {
   const padded = str.replace(/-/g, '+').replace(/_/g, '/')
   const padding = '='.repeat((4 - (padded.length % 4)) % 4)
@@ -23,7 +23,7 @@ function base64UrlDecode(str: string): string {
   return decoder.decode(bytes)
 }
 
-// JWT 签名
+// JWT signing
 async function signJWT(payload: object, secret: string): Promise<string> {
   const header = { alg: 'HS256', typ: 'JWT' }
   const encoder = new TextEncoder()
@@ -52,7 +52,7 @@ async function signJWT(payload: object, secret: string): Promise<string> {
   return `${message}.${signatureB64}`
 }
 
-// JWT 验证
+// JWT verification
 async function verifyJWT(token: string, secret: string): Promise<any> {
   const parts = token.split('.')
   if (parts.length !== 3) {
@@ -108,7 +108,7 @@ export async function createUploadJWT(
     sessionId,
     type: 'upload',
     iat: now,
-    exp: now + 24 * 60 * 60, // 24小时
+    exp: now + 24 * 60 * 60, // 24 hours
   }
   return signJWT(payload, secret)
 }
@@ -121,7 +121,7 @@ export async function createChestJWT(
   const now = Math.floor(Date.now() / 1000)
   const expiry = expiryTimestamp
     ? Math.floor(expiryTimestamp.getTime() / 1000)
-    : now + 365 * 24 * 60 * 60 // 永久有效则设为1年
+    : now + 365 * 24 * 60 * 60 // Set to 1 year for permanent validity
 
   const payload: ChestJWTPayload = {
     sessionId,
@@ -151,7 +151,7 @@ export async function createMultipartJWT(
     fileSize,
     type: 'multipart',
     iat: now,
-    exp: now + 48 * 60 * 60, // 48小时
+    exp: now + 48 * 60 * 60, // 48 hours
   }
   return signJWT(payload, secret)
 }

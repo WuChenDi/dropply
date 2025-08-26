@@ -17,7 +17,7 @@ import type { CloudflareEnv } from '@/types'
 
 export const retrieveRoutes = new Hono<{ Bindings: CloudflareEnv }>()
 
-// GET /retrieve/:retrievalCode - 获取 chest 内容
+// GET /retrieve/:retrievalCode - Retrieve chest contents
 retrieveRoutes.get(
   '/retrieve/:retrievalCode',
   zValidator('param', retrievalCodeParamSchema),
@@ -28,7 +28,7 @@ retrieveRoutes.get(
       const db = useDrizzle(c)
       const { retrievalCode } = c.req.valid('param')
 
-      // 查找会话
+      // Find session
       const session = await db
         ?.select()
         .from(sessions)
@@ -53,7 +53,7 @@ retrieveRoutes.get(
         )
       }
 
-      // 检查是否过期
+      // Check if expired
       if (session.expiresAt && session.expiresAt < new Date()) {
         return c.json<ApiResponse>(
           {
@@ -64,7 +64,7 @@ retrieveRoutes.get(
         )
       }
 
-      // 获取所有文件
+      // Get all files
       const sessionFiles = await db
         ?.select()
         .from(files)
@@ -81,7 +81,7 @@ retrieveRoutes.get(
         )
       }
 
-      // 创建 chest JWT
+      // Create chest JWT
       const chestToken = await createChestJWT(
         session.id,
         session.expiresAt,
