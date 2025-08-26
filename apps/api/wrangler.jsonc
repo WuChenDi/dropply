@@ -11,19 +11,19 @@
     "DB_TYPE": "libsql",
     // LibSQL Configuration
     // The URL for connecting to the LibSQL database. Default is a local SQLite file.
-    "LIBSQL_URL": "libsql://dropply-cdhj996.aws-ap-northeast-1.turso.io",
+    "LIBSQL_URL": "your_libsql_url",
     // The authentication token for accessing the LibSQL
-    "LIBSQL_AUTH_TOKEN": "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3NTU3NzQ3OTUsImlkIjoiOTMyYTU0YjUtMWNkNS00NzFkLWE1ZDgtNGVlZTZjM2YzMjM0IiwicmlkIjoiNzA2MjRjNDktZWI5OC00M2YyLWIwY2MtZGM0YjVmM2EyMmE2In0.qCMa-Ju9oTEl0wq7IXzto_sdD7cl-DBxb9V1lS-5EHqeeNIkvK976cEuzL3E9OFn2iuNkDOMuOPWFwLEgRjMAA",
+    "LIBSQL_AUTH_TOKEN": "your_libsql_auth_token",
 
     "REQUIRE_TOTP": "false",
-    "JWT_SECRET": "Chbq8SyG+AV1FMwoMKS7j9SHmWOlIg9VhPYSP5GnwcU=",
-    "TOTP_SECRETS": "admin:7V7NKSC6Q23Y4WCEE5HDEBPU3GPIU6ZH",
+    "JWT_SECRET": "your_jwt_secret",
+    "TOTP_SECRETS": "your_totp_secrets",
 
     // Email Configuration
-    "ENABLE_EMAIL_SHARE": "true",
-    "RESEND_API_KEY": "re_AEgBMyPG_EjQY1mHdV8EC2hJGjQYoseDq",
+    "ENABLE_EMAIL_SHARE": "false",
+    "RESEND_API_KEY": "your_resend_api_key",
     "RESEND_FROM_EMAIL": "noreply@resend.dev",
-    "RESEND_WEB_URL": "https://dropply.pages.dev"
+    "RESEND_WEB_URL": "your_resend_web_url"
   },
   "r2_buckets": [
     {
