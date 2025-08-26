@@ -23,8 +23,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@cdlab996/dropply-ui'
-
-import { FileUploadProgress } from '@/lib'
+import { FileUploadProgress } from '@cdlab996/dropply-utils'
 
 interface UploadProgressProps {
   files: File[]

@@ -1,8 +1,7 @@
 'use client'
 
 import { cn, Label } from '@cdlab996/dropply-ui'
-
-import { ValidityDays } from '@/lib'
+import { ValidityDays } from '@cdlab996/dropply-utils'
 
 interface ExpirySelectorProps {
   value: ValidityDays

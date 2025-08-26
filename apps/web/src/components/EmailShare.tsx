@@ -13,7 +13,7 @@ import {
   cn,
 } from '@cdlab996/dropply-ui'
 import { PocketChestAPI } from '@/lib'
-import type { EmailShareRequest } from '@/lib/types'
+import { EmailShareRequest } from '@cdlab996/dropply-utils'
 
 interface EmailShareProps {
   retrievalCode: string

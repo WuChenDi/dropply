@@ -4,8 +4,7 @@ import { useState } from 'react'
 import { Plus, X, FileText, Hash } from 'lucide-react'
 
 import { cn, Button, Input, Textarea, Label } from '@cdlab996/dropply-ui'
-
-import { TextItem } from '@/lib'
+import { TextItem } from '@cdlab996/dropply-utils'
 
 interface TextInputProps {
   onTextItemsChange: (items: TextItem[]) => void

@@ -1,4 +1,3 @@
-// app/share/page.tsx
 'use client'
 
 import { useState, useEffect } from 'react'
@@ -10,7 +9,6 @@ import {
   Clock,
   Copy,
   CheckCircle,
-  Sparkles,
   X,
   Mail,
 } from 'lucide-react'
@@ -34,8 +32,8 @@ import { UploadProgress } from '@/components/UploadProgress'
 import { EmailShare } from '@/components/EmailShare'
 
 import { usePocketChest } from '@/hooks/usePocketChest'
-import { PocketChestAPI, TextItem, ValidityDays } from '@/lib'
-import type { ServerConfig } from '@/lib/types'
+import { PocketChestAPI } from '@/lib'
+import { TextItem, ValidityDays } from '@cdlab996/dropply-utils'
 
 export default function SharePage() {
   const [files, setFiles] = useState<File[]>([])
@@ -80,7 +78,7 @@ export default function SharePage() {
     const initializeApp = async () => {
       try {
         // First, fetch server configuration
-        const config: ServerConfig = await api.getConfig()
+        const config = await api.getConfig()
         setRequireTOTP(config.requireTOTP)
         setEmailShareEnabled(config.emailShareEnabled)
         setConfigLoaded(true)

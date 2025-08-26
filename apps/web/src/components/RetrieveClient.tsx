@@ -26,8 +26,8 @@ import {
 } from '@cdlab996/dropply-ui'
 
 import { usePocketChest } from '@/hooks/usePocketChest'
-import { PocketChestAPI, FileInfo } from '@/lib'
-import { formatFileSize } from '@cdlab996/dropply-utils'
+import { PocketChestAPI } from '@/lib'
+import { type FileInfo, formatFileSize } from '@cdlab996/dropply-utils'
 
 interface FileWithContent extends FileInfo {
   content?: string
