@@ -1,3 +1,4 @@
+import { subtle } from '@cdlab996/dropply-uncrypto'
 import type {
   UploadJWTPayload,
   ChestJWTPayload,
@@ -31,7 +32,7 @@ async function signJWT(payload: object, secret: string): Promise<string> {
   const payloadB64 = base64UrlEncode(JSON.stringify(payload))
 
   const message = `${headerB64}.${payloadB64}`
-  const key = await crypto.subtle.importKey(
+  const key = await subtle.importKey(
     'raw',
     encoder.encode(secret),
     { name: 'HMAC', hash: 'SHA-256' },
@@ -39,11 +40,7 @@ async function signJWT(payload: object, secret: string): Promise<string> {
     ['sign'],
   )
 
-  const signature = await crypto.subtle.sign(
-    'HMAC',
-    key,
-    encoder.encode(message),
-  )
+  const signature = await subtle.sign('HMAC', key, encoder.encode(message))
   const signatureB64 = btoa(String.fromCharCode(...new Uint8Array(signature)))
     .replace(/[=]/g, '')
     .replace(/\+/g, '-')
@@ -67,7 +64,7 @@ async function verifyJWT(token: string, secret: string): Promise<any> {
 
   const encoder = new TextEncoder()
   const message = `${headerB64}.${payloadB64}`
-  const key = await crypto.subtle.importKey(
+  const key = await subtle.importKey(
     'raw',
     encoder.encode(secret),
     { name: 'HMAC', hash: 'SHA-256' },
@@ -79,7 +76,7 @@ async function verifyJWT(token: string, secret: string): Promise<any> {
     atob(signatureB64.replace(/-/g, '+').replace(/_/g, '/')),
     (c) => c.charCodeAt(0),
   )
-  const isValid = await crypto.subtle.verify(
+  const isValid = await subtle.verify(
     'HMAC',
     key,
     signature,

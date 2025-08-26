@@ -1,3 +1,5 @@
+import { subtle, getRandomValues } from '@cdlab996/dropply-uncrypto'
+
 function base32Encode(buffer: Uint8Array): string {
   const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567'
   let result = ''
@@ -56,7 +58,7 @@ async function hmacSHA1(
   key: Uint8Array,
   data: Uint8Array,
 ): Promise<Uint8Array> {
-  const cryptoKey = await crypto.subtle.importKey(
+  const cryptoKey = await subtle.importKey(
     'raw',
     key as BufferSource,
     { name: 'HMAC', hash: 'SHA-1' },
@@ -64,17 +66,13 @@ async function hmacSHA1(
     ['sign'],
   )
 
-  const signature = await crypto.subtle.sign(
-    'HMAC',
-    cryptoKey,
-    data as BufferSource,
-  )
+  const signature = await subtle.sign('HMAC', cryptoKey, data as BufferSource)
   return new Uint8Array(signature)
 }
 
 export function generateTOTPSecret(): string {
   const buffer = new Uint8Array(20)
-  crypto.getRandomValues(buffer)
+  getRandomValues(buffer)
   return base32Encode(buffer)
 }
 
