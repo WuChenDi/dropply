@@ -543,8 +543,8 @@ export default function SharePage() {
                   </span>
                 ) : (
                   <>
-                    <span className="mr-2">Upload & Generate Code</span>
                     <Upload size={18} />
+                    <span>Upload & Generate Code</span>
                   </>
                 )}
               </Button>
