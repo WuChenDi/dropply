@@ -81,7 +81,7 @@ export function TextInput({ onTextItemsChange, textItems }: TextInputProps) {
                 'disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100',
               )}
             >
-              <Plus size={16} className="mr-2" />
+              <Plus size={16} />
               Add Text
             </Button>
           </div>
