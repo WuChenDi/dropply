@@ -33,47 +33,49 @@ A secure file sharing platform built with Next.js and Cloudflare Workers. no acc
 ### System Diagram
 
 ```mermaid
-graph TB
-    subgraph Client Layer
-        A[Web Browser]
-        B[Mobile Device]
-        C[Email Client]
+graph TD
+    subgraph "Frontend (Next.js App)"
+        A[User Interface] -->|Share Files/Text| B[Share Page]
+        A -->|Retrieve Files| C[Retrieve Page]
+        B -->|API Calls| D[PocketChestAPI]
+        C -->|API Calls| D
     end
-    
-    subgraph CDN/Edge Layer
-        D[Cloudflare Workers]
-        E[Cloudflare R2 Storage]
-        F[Cron Triggers]
+
+    subgraph "Backend (Hono on Cloudflare Workers)"
+        D -->|Create Session| E[Chest Routes]
+        D -->|Upload Files/Text| E
+        D -->|Complete Upload| E
+        D -->|Multipart Upload| E
+        D -->|Retrieve| F[Retrieve Routes]
+        D -->|Download| G[Download Routes]
+        D -->|Email Share| H[Email Routes]
+        D -->|Config| I[Config Routes]
+
+        J[Cron Job] -->|Cleanup Expired| K[Cleanup Function]
     end
-    
-    subgraph Application Layer
-        G[Next.js Frontend]
-        H[Hono API Framework]
-        I[Drizzle ORM]
-        J[JWT Authentication]
-        K[TOTP Validation]
-        L[Email Service]
+
+    subgraph "Database (SQLite via Drizzle)"
+        E -->|Store Sessions/Files| L[DB: sessions/files]
+        F -->|Query| L
+        K -->|Query/Delete| L
     end
-    
-    subgraph Database Layer
-        M[Cloudflare D1]
-        N[LibSQL/Turso]
+
+    subgraph "Storage (Cloudflare R2)"
+        E -->|Store Files| M[R2 Bucket]
+        G -->|Fetch Files| M
+        K -->|Delete Objects| M
     end
-    
-    A --> G
-    B --> G
-    C --> G
-    G --> D
-    D --> H
-    H --> I
-    H --> J
-    H --> K
-    H --> L
-    I --> M
-    I --> N
-    F --> H
-    H --> E
-    L --> C
+
+    subgraph "External Services"
+        H -->|Send Email| N[Resend API]
+    end
+
+    subgraph "Security"
+        O[JWT Auth]
+        P[TOTP Auth]
+        E --> O
+        E --> P
+    end
 ```
 
 ## Project Structure
