@@ -6,7 +6,7 @@
     "module": "ESNext",
     "jsx": "react-jsx",
     "baseUrl": ".",
-    "paths": {},
+    "paths": {}
   },
   "include": ["src/**/*"]
 }

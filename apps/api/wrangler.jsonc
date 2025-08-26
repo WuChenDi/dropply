@@ -22,7 +22,8 @@
     // Email Configuration
     "ENABLE_EMAIL_SHARE": "true",
     "RESEND_API_KEY": "re_AEgBMyPG_EjQY1mHdV8EC2hJGjQYoseDq",
-    "RESEND_FROM_EMAIL": "noreply@resend.dev"
+    "RESEND_FROM_EMAIL": "noreply@resend.dev",
+    "RESEND_WEB_URL": "https://dropply.pages.dev"
   },
   "r2_buckets": [
     {

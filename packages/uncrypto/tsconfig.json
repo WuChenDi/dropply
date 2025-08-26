@@ -1,0 +1,7 @@
+{
+  "extends": "@cdlab996/dropply-tsconfig/utils",
+  "compilerOptions": {
+    "outDir": "dist"
+  },
+  "include": ["src/"]
+}

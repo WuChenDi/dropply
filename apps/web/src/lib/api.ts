@@ -1,36 +1,45 @@
 import {
+  ApiResponse,
+  ConfigResponse,
   CreateChestResponse,
-  UploadResponse,
+  UploadFileResponse,
   CompleteUploadResponse,
-  RetrieveResponse,
-  TextItem,
-  ValidityDays,
+  RetrieveChestResponse,
   CreateMultipartUploadResponse,
   UploadPartResponse,
+  CompleteMultipartUploadResponse,
+  emailShareResponse,
+  TextItem,
+  ValidityDays,
   UploadPart,
+  UploadResponse,
   MultipartUploadProgress,
   FileUploadProgress,
   EmailShareRequest,
-  EmailShareResponse,
-  ServerConfig,
-} from './types'
+} from '@cdlab996/dropply-utils'
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://localhost:3000'
 
 export class PocketChestAPI {
   constructor(private baseUrl: string = API_BASE_URL) {}
 
-  async getConfig(): Promise<ServerConfig> {
+  async getConfig() {
     const response = await fetch(`${this.baseUrl}/api/config`)
 
     if (!response.ok) {
       throw new Error('Failed to fetch server config')
     }
 
-    return response.json()
+    const result: ApiResponse<ConfigResponse> = await response.json()
+
+    if (result.code === 0) {
+      return result.data!
+    } else {
+      throw new Error(result.message)
+    }
   }
 
-  async createChest(totpToken?: string): Promise<CreateChestResponse> {
+  async createChest(totpToken?: string) {
     const body = totpToken ? { totpToken } : {}
 
     const response = await fetch(`${this.baseUrl}/api/chest`, {
@@ -41,12 +50,13 @@ export class PocketChestAPI {
       body: JSON.stringify(body),
     })
 
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({}))
-      throw new Error(error.error || 'Failed to create chest')
-    }
+    const result: ApiResponse<CreateChestResponse> = await response.json()
 
-    return response.json()
+    if (result.code === 0) {
+      return result.data!
+    } else {
+      throw new Error(result.message)
+    }
   }
 
   async uploadContent(
@@ -60,7 +70,9 @@ export class PocketChestAPI {
       percentage: number
     }) => void,
     onFileProgress?: (progress: FileUploadProgress[]) => void,
-  ): Promise<UploadResponse> {
+  ): Promise<{
+    uploadedFiles: Array<{ fileId: string; filename: string; isText: boolean }>
+  }> {
     const CHUNK_SIZE = 20 * 1024 * 1024 // 20MB chunk size
 
     // Separate small and large files - split if larger than one chunk
@@ -390,13 +402,29 @@ export class PocketChestAPI {
         xhr.addEventListener('load', () => {
           if (xhr.status >= 200 && xhr.status < 300) {
             try {
-              const result = JSON.parse(xhr.responseText)
-              resolve(result)
+              const result: ApiResponse<UploadFileResponse> = JSON.parse(
+                xhr.responseText,
+              )
+              if (result.code === 0) {
+                resolve(result.data!)
+              } else {
+                reject(new Error(result.message))
+              }
             } catch (error) {
               reject(new Error('Failed to parse response'))
             }
           } else {
-            reject(new Error(`Upload failed with status ${xhr.status}`))
+            try {
+              const errorResult: ApiResponse = JSON.parse(xhr.responseText)
+              reject(
+                new Error(
+                  errorResult.message ||
+                    `Upload failed with status ${xhr.status}`,
+                ),
+              )
+            } catch {
+              reject(new Error(`Upload failed with status ${xhr.status}`))
+            }
           }
         })
 
@@ -422,11 +450,13 @@ export class PocketChestAPI {
       },
     )
 
-    if (!response.ok) {
-      throw new Error('Failed to upload files')
-    }
+    const result: ApiResponse<UploadFileResponse> = await response.json()
 
-    return response.json()
+    if (result.code === 0) {
+      return result.data!
+    } else {
+      throw new Error(result.message)
+    }
   }
 
   async completeUpload(
@@ -434,7 +464,7 @@ export class PocketChestAPI {
     uploadToken: string,
     fileIds: string[],
     validityDays: ValidityDays = 7,
-  ): Promise<CompleteUploadResponse> {
+  ) {
     const response = await fetch(
       `${this.baseUrl}/api/chest/${sessionId}/complete`,
       {
@@ -450,26 +480,27 @@ export class PocketChestAPI {
       },
     )
 
-    if (!response.ok) {
-      throw new Error('Failed to complete upload')
-    }
+    const result: ApiResponse<CompleteUploadResponse> = await response.json()
 
-    return response.json()
+    if (result.code === 0) {
+      return result.data!
+    } else {
+      throw new Error(result.message)
+    }
   }
 
-  async retrieveChest(retrievalCode: string): Promise<RetrieveResponse> {
+  async retrieveChest(retrievalCode: string) {
     const response = await fetch(
       `${this.baseUrl}/api/retrieve/${retrievalCode}`,
     )
 
-    if (!response.ok) {
-      if (response.status === 404) {
-        throw new Error('Retrieval code not found or expired')
-      }
-      throw new Error('Failed to retrieve chest')
-    }
+    const result: ApiResponse<RetrieveChestResponse> = await response.json()
 
-    return response.json()
+    if (result.code === 0) {
+      return result.data!
+    } else {
+      throw new Error(result.message)
+    }
   }
 
   async downloadFile(fileId: string, chestToken: string): Promise<Blob> {
@@ -538,7 +569,7 @@ export class PocketChestAPI {
     filename: string,
     mimeType: string,
     fileSize: number,
-  ): Promise<CreateMultipartUploadResponse> {
+  ) {
     const response = await fetch(
       `${this.baseUrl}/api/chest/${sessionId}/multipart/create`,
       {
@@ -555,11 +586,14 @@ export class PocketChestAPI {
       },
     )
 
-    if (!response.ok) {
-      throw new Error('Failed to create multipart upload')
-    }
+    const result: ApiResponse<CreateMultipartUploadResponse> =
+      await response.json()
 
-    return response.json()
+    if (result.code === 0) {
+      return result.data!
+    } else {
+      throw new Error(result.message)
+    }
   }
 
   async uploadPart(
@@ -584,17 +618,33 @@ export class PocketChestAPI {
         xhr.addEventListener('load', () => {
           if (xhr.status >= 200 && xhr.status < 300) {
             try {
-              const result = JSON.parse(xhr.responseText)
-              resolve(result)
+              const result: ApiResponse<UploadPartResponse> = JSON.parse(
+                xhr.responseText,
+              )
+              if (result.code === 0) {
+                resolve(result.data!)
+              } else {
+                reject(new Error(result.message))
+              }
             } catch (error) {
               reject(new Error('Failed to parse response'))
             }
           } else {
-            reject(
-              new Error(
-                `Failed to upload part ${partNumber} with status ${xhr.status}`,
-              ),
-            )
+            try {
+              const errorResult: ApiResponse = JSON.parse(xhr.responseText)
+              reject(
+                new Error(
+                  errorResult.message ||
+                    `Failed to upload part ${partNumber} with status ${xhr.status}`,
+                ),
+              )
+            } catch {
+              reject(
+                new Error(
+                  `Failed to upload part ${partNumber} with status ${xhr.status}`,
+                ),
+              )
+            }
           }
         })
 
@@ -625,11 +675,13 @@ export class PocketChestAPI {
       },
     )
 
-    if (!response.ok) {
-      throw new Error(`Failed to upload part ${partNumber}`)
-    }
+    const result: ApiResponse<UploadPartResponse> = await response.json()
 
-    return response.json()
+    if (result.code === 0) {
+      return result.data!
+    } else {
+      throw new Error(result.message)
+    }
   }
 
   async completeMultipartUpload(
@@ -637,7 +689,7 @@ export class PocketChestAPI {
     multipartToken: string,
     fileId: string,
     parts: UploadPart[],
-  ): Promise<{ fileId: string; filename: string }> {
+  ) {
     const response = await fetch(
       `${this.baseUrl}/api/chest/${sessionId}/multipart/${fileId}/complete`,
       {
@@ -650,11 +702,14 @@ export class PocketChestAPI {
       },
     )
 
-    if (!response.ok) {
-      throw new Error('Failed to complete multipart upload')
-    }
+    const result: ApiResponse<CompleteMultipartUploadResponse> =
+      await response.json()
 
-    return response.json()
+    if (result.code === 0) {
+      return result.data!
+    } else {
+      throw new Error(result.message)
+    }
   }
 
   async uploadLargeFile(
@@ -816,9 +871,7 @@ export class PocketChestAPI {
     return result
   }
 
-  async shareViaEmail(
-    emailData: EmailShareRequest,
-  ): Promise<EmailShareResponse> {
+  async shareViaEmail(emailData: EmailShareRequest) {
     const response = await fetch(`${this.baseUrl}/api/email/share`, {
       method: 'POST',
       headers: {
@@ -827,11 +880,12 @@ export class PocketChestAPI {
       body: JSON.stringify(emailData),
     })
 
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({}))
-      throw new Error(error.message || 'Failed to send email')
-    }
+    const result: ApiResponse<emailShareResponse> = await response.json()
 
-    return response.json()
+    if (result.code === 0) {
+      return result.data!
+    } else {
+      throw new Error(result.message)
+    }
   }
 }

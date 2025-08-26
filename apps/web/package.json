@@ -16,10 +16,12 @@
   },
   "dependencies": {
     "@cdlab996/dropply-ui": "workspace:*",
+    "@cdlab996/dropply-uncrypto": "workspace:*",
+    "@cdlab996/dropply-utils": "workspace:*",
     "@next/third-parties": "catalog:prod",
     "lucide-react": "catalog:prod",
-    "next-themes": "catalog:prod",
     "next": "catalog:prod",
+    "next-themes": "catalog:prod",
     "react": "catalog:prod",
     "react-dom": "catalog:prod",
     "react-dropzone": "catalog:prod",

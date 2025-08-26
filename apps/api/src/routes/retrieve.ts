@@ -1,15 +1,19 @@
 import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'
-import { HTTPException } from 'hono/http-exception'
 import { eq, and } from 'drizzle-orm'
 import { sessions, files } from '@/database/schema'
-import type { CloudflareEnv, RetrieveChestResponse } from '@/types'
 import {
   useDrizzle,
   withNotDeleted,
   createChestJWT,
   retrievalCodeParamSchema,
 } from '@/lib'
+
+import type {
+  ApiResponse,
+  RetrieveChestResponse,
+} from '@cdlab996/dropply-utils'
+import type { CloudflareEnv } from '@/types'
 
 export const retrieveRoutes = new Hono<{ Bindings: CloudflareEnv }>()
 
@@ -18,74 +22,110 @@ retrieveRoutes.get(
   '/retrieve/:retrievalCode',
   zValidator('param', retrievalCodeParamSchema),
   async (c) => {
-    const db = useDrizzle(c)
-    const { retrievalCode } = c.req.valid('param')
+    const requestId = c.get('requestId')
 
-    // 查找会话
-    const session = await db
-      ?.select()
-      .from(sessions)
-      .where(
-        withNotDeleted(
-          sessions,
-          and(
-            eq(sessions.retrievalCode, retrievalCode),
-            eq(sessions.uploadComplete, 1),
+    try {
+      const db = useDrizzle(c)
+      const { retrievalCode } = c.req.valid('param')
+
+      // 查找会话
+      const session = await db
+        ?.select()
+        .from(sessions)
+        .where(
+          withNotDeleted(
+            sessions,
+            and(
+              eq(sessions.retrievalCode, retrievalCode),
+              eq(sessions.uploadComplete, 1),
+            ),
           ),
-        ),
+        )
+        .get()
+
+      if (!session) {
+        return c.json<ApiResponse>(
+          {
+            code: 404,
+            message: 'Session not found or already completed',
+          },
+          404,
+        )
+      }
+
+      // 检查是否过期
+      if (session.expiresAt && session.expiresAt < new Date()) {
+        return c.json<ApiResponse>(
+          {
+            code: 404,
+            message: 'Retrieval code expired',
+          },
+          404,
+        )
+      }
+
+      // 获取所有文件
+      const sessionFiles = await db
+        ?.select()
+        .from(files)
+        .where(withNotDeleted(files, eq(files.sessionId, session.id)))
+        .orderBy(files.createdAt)
+
+      if (!sessionFiles || sessionFiles.length === 0) {
+        return c.json<ApiResponse>(
+          {
+            code: 404,
+            message: 'No files found for this session',
+          },
+          404,
+        )
+      }
+
+      // 创建 chest JWT
+      const chestToken = await createChestJWT(
+        session.id,
+        session.expiresAt,
+        c.env.JWT_SECRET,
       )
-      .get()
 
-    if (!session) {
-      throw new HTTPException(404, {
-        message: 'Retrieval code not found or expired',
+      logger.info('Chest retrieved', {
+        retrievalCode,
+        sessionId: session.id,
+        fileCount: sessionFiles.length,
       })
-    }
 
-    // 检查是否过期
-    if (session.expiresAt && session.expiresAt < new Date()) {
-      throw new HTTPException(404, { message: 'Retrieval code expired' })
-    }
-
-    // 获取所有文件
-    const sessionFiles = await db
-      ?.select()
-      .from(files)
-      .where(withNotDeleted(files, eq(files.sessionId, session.id)))
-      .orderBy(files.createdAt)
-
-    if (!sessionFiles || sessionFiles.length === 0) {
-      throw new HTTPException(404, {
-        message: 'No files found for this session',
+      return c.json<ApiResponse<RetrieveChestResponse>>({
+        code: 0,
+        message: 'ok',
+        data: {
+          files: sessionFiles.map((file) => ({
+            fileId: file.id,
+            filename: file.originalFilename,
+            size: file.fileSize,
+            mimeType: file.mimeType,
+            isText: Boolean(file.isText),
+            fileExtension: file.fileExtension,
+          })),
+          chestToken,
+          expiryDate: session.expiresAt?.toISOString() || null,
+        },
       })
+    } catch (error) {
+      logger.error(
+        `[${requestId}] Failed to retrieve chest, ${JSON.stringify({
+          error: error instanceof Error ? error.message : 'Unknown error',
+        })}`,
+      )
+
+      const errorMessage =
+        error instanceof Error ? error.message : 'Failed to retrieve chest'
+      return c.json<ApiResponse>(
+        {
+          code: 500,
+          message: errorMessage,
+        },
+        500,
+      )
     }
-
-    // 创建 chest JWT
-    const chestToken = await createChestJWT(
-      session.id,
-      session.expiresAt,
-      c.env.JWT_SECRET,
-    )
-
-    logger.info('Chest retrieved', {
-      retrievalCode,
-      sessionId: session.id,
-      fileCount: sessionFiles.length,
-    })
-
-    const response: RetrieveChestResponse = {
-      files: sessionFiles.map((file) => ({
-        fileId: file.id,
-        filename: file.originalFilename,
-        size: file.fileSize,
-        mimeType: file.mimeType,
-        isText: Boolean(file.isText),
-        fileExtension: file.fileExtension,
-      })),
-      chestToken,
-      expiryDate: session.expiresAt?.toISOString() || null,
-    }
-
-    return c.json(response)
   },
 )

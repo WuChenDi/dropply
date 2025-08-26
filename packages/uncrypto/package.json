@@ -1,0 +1,52 @@
+{
+  "name": "@cdlab996/dropply-uncrypto",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "Single API for Web Crypto API and Crypto Subtle working in Node.js, Browsers and other runtimes",
+  "homepage": "https://github.com/WuChenDi",
+  "author": "wudi <wuchendi96@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/WuChenDi/dropply.git",
+    "directory": "packages/uncrypto"
+  },
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "browser": {
+        "types": "./dist/crypto.web.d.ts",
+        "import": "./dist/crypto.web.js",
+        "require": "./dist/crypto.web.cjs"
+      },
+      "node": {
+        "types": "./dist/crypto.node.d.ts",
+        "import": "./dist/crypto.node.js",
+        "require": "./dist/crypto.node.cjs"
+      },
+      "default": {
+        "types": "./dist/crypto.web.d.ts",
+        "import": "./dist/crypto.web.js"
+      }
+    }
+  },
+  "main": "./dist/crypto.node.cjs",
+  "module": "./dist/crypto.web.js",
+  "browser": "./dist/crypto.web.js",
+  "types": "./dist/crypto.web.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --project ./tsconfig.json --noEmit",
+    "prepack": "pnpm build"
+  },
+  "devDependencies": {
+    "@cdlab996/dropply-tsconfig": "workspace:*",
+    "@types/node": "catalog:dev",
+    "tsup": "catalog:dev",
+    "typescript": "catalog:dev"
+  }
+}
