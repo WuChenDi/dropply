@@ -1,17 +1,7 @@
 import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'
-import { HTTPException } from 'hono/http-exception'
 import { eq, and } from 'drizzle-orm'
 import { sessions, files } from '@/database/schema'
-import type {
-  CloudflareEnv,
-  CreateChestResponse,
-  UploadFileResponse,
-  CompleteUploadResponse,
-  CreateMultipartUploadResponse,
-  CompleteMultipartUploadResponse,
-  UploadPartResponse,
-} from '@/types'
 import {
   createUploadJWT,
   createMultipartJWT,
@@ -33,6 +23,17 @@ import {
   partNumberParamSchema,
 } from '@/lib'
 
+import type {
+  ApiResponse,
+  CreateChestResponse,
+  UploadFileResponse,
+  CompleteUploadResponse,
+  CreateMultipartUploadResponse,
+  CompleteMultipartUploadResponse,
+  UploadPartResponse,
+} from '@cdlab996/dropply-utils'
+import type { CloudflareEnv } from '@/types'
+
 export const chestRoutes = new Hono<{ Bindings: CloudflareEnv }>()
 
 // POST /chest - 创建新的 chest
@@ -40,6 +41,8 @@ chestRoutes.post(
   '/chest',
   zValidator('json', createChestRequestSchema),
   async (c) => {
+    const requestId = c.get('requestId')
+
     const db = useDrizzle(c)
     const requireTOTP = c.env.REQUIRE_TOTP === 'true'
     const { totpToken } = c.req.valid('json')
@@ -47,18 +50,34 @@ chestRoutes.post(
     // TOTP 验证
     if (requireTOTP) {
       if (!totpToken) {
-        throw new HTTPException(401, { message: 'TOTP token required' })
+        return c.json<ApiResponse>(
+          {
+            code: 401,
+            message: 'TOTP token required',
+          },
+          401,
+        )
       }
 
       if (!c.env.TOTP_SECRETS) {
-        throw new HTTPException(500, {
-          message: 'TOTP not configured on server',
-        })
+        return c.json<ApiResponse>(
+          {
+            code: 500,
+            message: 'TOTP not configured on server',
+          },
+          500,
+        )
       }
 
       const isValidTOTP = await verifyAnyTOTP(totpToken, c.env.TOTP_SECRETS)
       if (!isValidTOTP) {
-        throw new HTTPException(401, { message: 'Invalid TOTP token' })
+        return c.json<ApiResponse>(
+          {
+            code: 401,
+            message: 'Invalid TOTP token',
+          },
+          401,
+        )
       }
     }
 
@@ -79,10 +98,30 @@ chestRoutes.post(
         expiresIn: 86400, // 24小时
       }
 
-      return c.json(response)
+      return c.json<ApiResponse<CreateChestResponse>>({
+        code: 0,
+        message: 'ok',
+        data: {
+          ...response,
+        },
+      })
     } catch (error) {
-      logger.error('Failed to create chest session', { sessionId, error })
-      throw new HTTPException(500, { message: 'Failed to create session' })
+      logger.error(
+        `[${requestId}] Failed to create chest session, ${JSON.stringify({
+          sessionId,
+          error: error instanceof Error ? error.message : 'Unknown error',
+        })}`,
+      )
+
+      const errorMessage =
+        error instanceof Error ? error.message : 'Failed to create session'
+      return c.json<ApiResponse>(
+        {
+          code: 500,
+          message: errorMessage,
+        },
+        500,
+      )
     }
   },
 )
@@ -92,13 +131,20 @@ chestRoutes.post(
   '/chest/:sessionId/upload',
   zValidator('param', sessionIdParamSchema),
   async (c) => {
+    const requestId = c.get('requestId')
     const db = useDrizzle(c)
     const { sessionId } = c.req.valid('param')
 
     // 验证JWT令牌
     const authHeader = c.req.header('Authorization')
     if (!authHeader?.startsWith('Bearer ')) {
-      throw new HTTPException(401, { message: 'Unauthorized' })
+      return c.json<ApiResponse>(
+        {
+          code: 401,
+          message: 'Unauthorized',
+        },
+        401,
+      )
     }
 
     const token = authHeader.substring(7)
@@ -106,11 +152,23 @@ chestRoutes.post(
     try {
       payload = await verifyUploadJWT(token, c.env.JWT_SECRET)
     } catch (error) {
-      throw new HTTPException(401, { message: 'Invalid token' })
+      return c.json<ApiResponse>(
+        {
+          code: 401,
+          message: 'Invalid token',
+        },
+        401,
+      )
     }
 
     if (payload.sessionId !== sessionId) {
-      throw new HTTPException(400, { message: 'Invalid session' })
+      return c.json<ApiResponse>(
+        {
+          code: 400,
+          message: 'Invalid session',
+        },
+        400,
+      )
     }
 
     // 检查会话是否存在且未完成
@@ -126,9 +184,13 @@ chestRoutes.post(
       .get()
 
     if (!session) {
-      throw new HTTPException(404, {
-        message: 'Session not found or already completed',
-      })
+      return c.json<ApiResponse>(
+        {
+          code: 404,
+          message: 'Session not found or already completed',
+        },
+        404,
+      )
     }
 
     // 解析表单数据
@@ -212,11 +274,28 @@ chestRoutes.post(
         count: uploadedFiles.length,
       })
 
-      const response: UploadFileResponse = { uploadedFiles }
-      return c.json(response)
+      return c.json<ApiResponse<UploadFileResponse>>({
+        code: 0,
+        message: 'ok',
+        data: { uploadedFiles },
+      })
     } catch (error) {
-      logger.error('Failed to upload files', { sessionId, error })
-      throw new HTTPException(500, { message: 'Failed to upload files' })
+      logger.error(
+        `[${requestId}] Failed to upload files, ${JSON.stringify({
+          sessionId,
+          error: error instanceof Error ? error.message : 'Unknown error',
+        })}`,
+      )
+
+      const errorMessage =
+        error instanceof Error ? error.message : 'Failed to upload files'
+      return c.json<ApiResponse>(
+        {
+          code: 500,
+          message: errorMessage,
+        },
+        500,
+      )
     }
   },
 )
@@ -227,6 +306,7 @@ chestRoutes.post(
   zValidator('param', sessionIdParamSchema),
   zValidator('json', completeUploadRequestSchema),
   async (c) => {
+    const requestId = c.get('requestId')
     const db = useDrizzle(c)
     const { sessionId } = c.req.valid('param')
     const { fileIds, validityDays } = c.req.valid('json')
@@ -234,7 +314,13 @@ chestRoutes.post(
     // 验证JWT令牌
     const authHeader = c.req.header('Authorization')
     if (!authHeader?.startsWith('Bearer ')) {
-      throw new HTTPException(401, { message: 'Unauthorized' })
+      return c.json<ApiResponse>(
+        {
+          code: 401,
+          message: 'Unauthorized',
+        },
+        401,
+      )
     }
 
     const token = authHeader.substring(7)
@@ -242,11 +328,23 @@ chestRoutes.post(
     try {
       payload = await verifyUploadJWT(token, c.env.JWT_SECRET)
     } catch (error) {
-      throw new HTTPException(401, { message: 'Invalid token' })
+      return c.json<ApiResponse>(
+        {
+          code: 401,
+          message: 'Invalid token',
+        },
+        401,
+      )
     }
 
     if (payload.sessionId !== sessionId) {
-      throw new HTTPException(400, { message: 'Invalid session' })
+      return c.json<ApiResponse>(
+        {
+          code: 400,
+          message: 'Invalid session',
+        },
+        400,
+      )
     }
 
     // 验证文件所有权
@@ -256,9 +354,13 @@ chestRoutes.post(
       .where(withNotDeleted(files, eq(files.sessionId, sessionId)))
 
     if (fileCount?.length !== fileIds.length) {
-      throw new HTTPException(400, {
-        message: 'Some files do not belong to this session',
-      })
+      return c.json<ApiResponse>(
+        {
+          code: 400,
+          message: 'Some files do not belong to this session',
+        },
+        400,
+      )
     }
 
     const retrievalCode = generateRetrievalCode()
@@ -287,15 +389,31 @@ chestRoutes.post(
         expiryDate,
       })
 
-      const response: CompleteUploadResponse = {
-        retrievalCode,
-        expiryDate: expiryDate?.toISOString() || null,
-      }
-
-      return c.json(response)
+      return c.json<ApiResponse<CompleteUploadResponse>>({
+        code: 0,
+        message: 'ok',
+        data: {
+          retrievalCode,
+          expiryDate: expiryDate?.toISOString() || null,
+        },
+      })
     } catch (error) {
-      logger.error('Failed to complete upload', { sessionId, error })
-      throw new HTTPException(500, { message: 'Failed to complete upload' })
+      logger.error(
+        `[${requestId}] Failed to complete upload, ${JSON.stringify({
+          sessionId,
+          error: error instanceof Error ? error.message : 'Unknown error',
+        })}`,
+      )
+
+      const errorMessage =
+        error instanceof Error ? error.message : 'Failed to complete upload'
+      return c.json<ApiResponse>(
+        {
+          code: 500,
+          message: errorMessage,
+        },
+        500,
+      )
     }
   },
 )
@@ -306,6 +424,7 @@ chestRoutes.post(
   zValidator('param', sessionIdParamSchema),
   zValidator('json', createMultipartUploadRequestSchema),
   async (c) => {
+    const requestId = c.get('requestId')
     const db = useDrizzle(c)
     const { sessionId } = c.req.valid('param')
     const { filename, mimeType, fileSize } = c.req.valid('json')
@@ -313,7 +432,13 @@ chestRoutes.post(
     // 验证JWT令牌
     const authHeader = c.req.header('Authorization')
     if (!authHeader?.startsWith('Bearer ')) {
-      throw new HTTPException(401, { message: 'Unauthorized' })
+      return c.json<ApiResponse>(
+        {
+          code: 401,
+          message: 'Unauthorized',
+        },
+        401,
+      )
     }
 
     const token = authHeader.substring(7)
@@ -321,11 +446,23 @@ chestRoutes.post(
     try {
       payload = await verifyUploadJWT(token, c.env.JWT_SECRET)
     } catch (error) {
-      throw new HTTPException(401, { message: 'Invalid token' })
+      return c.json<ApiResponse>(
+        {
+          code: 401,
+          message: 'Invalid token',
+        },
+        401,
+      )
     }
 
     if (payload.sessionId !== sessionId) {
-      throw new HTTPException(400, { message: 'Invalid session' })
+      return c.json<ApiResponse>(
+        {
+          code: 400,
+          message: 'Invalid session',
+        },
+        400,
+      )
     }
 
     // 检查会话存在且未完成
@@ -341,9 +478,13 @@ chestRoutes.post(
       .get()
 
     if (!session) {
-      throw new HTTPException(404, {
-        message: 'Session not found or already completed',
-      })
+      return c.json<ApiResponse>(
+        {
+          code: 404,
+          message: 'Session not found or already completed',
+        },
+        404,
+      )
     }
 
     const fileId = generateUUID()
@@ -367,21 +508,34 @@ chestRoutes.post(
 
       logger.info('Multipart upload created', { sessionId, fileId, filename })
 
-      const response: CreateMultipartUploadResponse = {
-        fileId,
-        uploadId: multipartToken, // 返回JWT而不是原始uploadId
-      }
-
-      return c.json(response)
+      return c.json<ApiResponse<CreateMultipartUploadResponse>>({
+        code: 0,
+        message: 'ok',
+        data: {
+          fileId,
+          uploadId: multipartToken,
+        },
+      })
     } catch (error) {
-      logger.error('Failed to create multipart upload', {
-        sessionId,
-        fileId,
-        error,
-      })
-      throw new HTTPException(500, {
-        message: 'Failed to create multipart upload',
-      })
+      logger.error(
+        `[${requestId}] Failed to create multipart upload, ${JSON.stringify({
+          sessionId,
+          fileId,
+          error: error instanceof Error ? error.message : 'Unknown error',
+        })}`,
+      )
+
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : 'Failed to create multipart upload'
+      return c.json<ApiResponse>(
+        {
+          code: 500,
+          message: errorMessage,
+        },
+        500,
+      )
     }
   },
 )
@@ -394,12 +548,19 @@ chestRoutes.put(
     sessionIdParamSchema.merge(fileIdParamSchema).merge(partNumberParamSchema),
   ),
   async (c) => {
+    const requestId = c.get('requestId')
     const { sessionId, fileId, partNumber } = c.req.valid('param')
 
     // 验证分片JWT令牌
     const authHeader = c.req.header('Authorization')
     if (!authHeader?.startsWith('Bearer ')) {
-      throw new HTTPException(401, { message: 'Unauthorized' })
+      return c.json<ApiResponse>(
+        {
+          code: 401,
+          message: 'Unauthorized',
+        },
+        401,
+      )
     }
 
     const token = authHeader.substring(7)
@@ -407,19 +568,35 @@ chestRoutes.put(
     try {
       payload = await verifyMultipartJWT(token, c.env.JWT_SECRET)
     } catch (error) {
-      throw new HTTPException(401, { message: 'Invalid multipart token' })
+      return c.json<ApiResponse>(
+        {
+          code: 401,
+          message: 'Invalid multipart token',
+        },
+        401,
+      )
     }
 
     if (payload.sessionId !== sessionId || payload.fileId !== fileId) {
-      throw new HTTPException(403, {
-        message: 'Token does not match upload session',
-      })
+      return c.json<ApiResponse>(
+        {
+          code: 403,
+          message: 'Token does not match upload session',
+        },
+        403,
+      )
     }
 
     // 获取请求体
     const body = await c.req.arrayBuffer()
     if (!body || body.byteLength === 0) {
-      throw new HTTPException(400, { message: 'Empty part body' })
+      return c.json<ApiResponse>(
+        {
+          code: 400,
+          message: 'Empty part body',
+        },
+        400,
+      )
     }
 
     try {
@@ -436,20 +613,33 @@ chestRoutes.put(
         partNumber,
       })
 
-      const response: UploadPartResponse = {
-        etag: uploadedPart.etag,
-        partNumber,
-      }
-
-      return c.json(response)
-    } catch (error) {
-      logger.error('Failed to upload part', {
-        sessionId,
-        fileId,
-        partNumber,
-        error,
+      return c.json<ApiResponse<UploadPartResponse>>({
+        code: 0,
+        message: 'ok',
+        data: {
+          etag: uploadedPart.etag,
+          partNumber,
+        },
       })
-      throw new HTTPException(500, { message: 'Failed to upload part' })
+    } catch (error) {
+      logger.error(
+        `[${requestId}] Failed to upload part, ${JSON.stringify({
+          sessionId,
+          fileId,
+          partNumber,
+          error,
+        })}`,
+      )
+
+      const errorMessage =
+        error instanceof Error ? error.message : 'Failed to upload part'
+      return c.json<ApiResponse>(
+        {
+          code: 500,
+          message: errorMessage,
+        },
+        500,
+      )
     }
   },
 )
@@ -460,6 +650,7 @@ chestRoutes.post(
   zValidator('param', sessionIdParamSchema.merge(fileIdParamSchema)),
   zValidator('json', completeMultipartUploadRequestSchema),
   async (c) => {
+    const requestId = c.get('requestId')
     const db = useDrizzle(c)
     const { sessionId, fileId } = c.req.valid('param')
     const { parts } = c.req.valid('json')
@@ -467,7 +658,13 @@ chestRoutes.post(
     // 验证分片JWT令牌
     const authHeader = c.req.header('Authorization')
     if (!authHeader?.startsWith('Bearer ')) {
-      throw new HTTPException(401, { message: 'Unauthorized' })
+      return c.json<ApiResponse>(
+        {
+          code: 401,
+          message: 'Unauthorized',
+        },
+        401,
+      )
     }
 
     const token = authHeader.substring(7)
@@ -475,13 +672,23 @@ chestRoutes.post(
     try {
       payload = await verifyMultipartJWT(token, c.env.JWT_SECRET)
     } catch (error) {
-      throw new HTTPException(401, { message: 'Invalid multipart token' })
+      return c.json<ApiResponse>(
+        {
+          code: 401,
+          message: 'Invalid multipart token',
+        },
+        401,
+      )
     }
 
     if (payload.sessionId !== sessionId || payload.fileId !== fileId) {
-      throw new HTTPException(403, {
-        message: 'Token does not match upload session',
-      })
+      return c.json<ApiResponse>(
+        {
+          code: 403,
+          message: 'Token does not match upload session',
+        },
+        403,
+      )
     }
 
     // 按分片号排序
@@ -512,21 +719,34 @@ chestRoutes.post(
         filename: payload.filename,
       })
 
-      const response: CompleteMultipartUploadResponse = {
-        fileId,
-        filename: payload.filename,
-      }
-
-      return c.json(response)
+      return c.json<ApiResponse<CompleteMultipartUploadResponse>>({
+        code: 0,
+        message: 'ok',
+        data: {
+          fileId,
+          filename: payload.filename,
+        },
+      })
     } catch (error) {
-      logger.error('Failed to complete multipart upload', {
-        sessionId,
-        fileId,
-        error,
-      })
-      throw new HTTPException(500, {
-        message: 'Failed to complete multipart upload',
-      })
+      logger.error(
+        `[${requestId}] Failed to complete multipart upload, ${JSON.stringify({
+          sessionId,
+          fileId,
+          error: error instanceof Error ? error.message : 'Unknown error',
+        })}`,
+      )
+
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : 'Failed to complete multipart upload'
+      return c.json<ApiResponse>(
+        {
+          code: 500,
+          message: errorMessage,
+        },
+        500,
+      )
     }
   },
 )

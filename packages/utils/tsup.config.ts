@@ -6,7 +6,8 @@ export default defineConfig((options) => ({
   clean: true,
   dts: true,
   format: ['esm'],
-  treeshake: true,
+  platform: 'browser',
+  target: ['es2020', 'chrome80', 'edge18', 'firefox80', 'node18'],
   sourcemap: !options.watch,
   minify: !options.watch,
 }))

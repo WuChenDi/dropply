@@ -1,0 +1,39 @@
+{
+  "name": "@cdlab996/dropply-utils",
+  "type": "module",
+  "version": "1.0.0",
+  "homepage": "https://github.com/WuChenDi",
+  "author": "wudi <wuchendi96@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/WuChenDi/dropply.git",
+    "directory": "packages/utils"
+  },
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --project ./tsconfig.json --noEmit",
+    "prepack": "pnpm build"
+  },
+  "dependencies": {
+    "@cdlab996/dropply-uncrypto": "workspace:*"
+  },
+  "devDependencies": {
+    "@cdlab996/dropply-tsconfig": "workspace:*",
+    "@types/node": "catalog:dev",
+    "tsup": "catalog:dev",
+    "typescript": "catalog:dev"
+  }
+}

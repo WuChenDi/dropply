@@ -1,6 +1,8 @@
+import { subtle, randomUUID, getRandomValues } from '@cdlab996/dropply-uncrypto'
+
 // 生成 UUID v4
 export function generateUUID(): string {
-  return crypto.randomUUID()
+  return randomUUID()
 }
 
 // 生成6位字母数字检索码

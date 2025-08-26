@@ -24,6 +24,8 @@
     "db:up": "drizzle-kit up"
   },
   "dependencies": {
+    "@cdlab996/dropply-uncrypto": "workspace:*",
+    "@cdlab996/dropply-utils": "workspace:*",
     "@hono/zod-validator": "catalog:prod",
     "@libsql/client": "catalog:prod",
     "@react-email/components": "catalog:prod",

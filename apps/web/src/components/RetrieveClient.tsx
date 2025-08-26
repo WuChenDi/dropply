@@ -27,6 +27,7 @@ import {
 
 import { usePocketChest } from '@/hooks/usePocketChest'
 import { PocketChestAPI, FileInfo } from '@/lib'
+import { formatFileSize } from '@cdlab996/dropply-utils'
 
 interface FileWithContent extends FileInfo {
   content?: string
@@ -60,8 +61,9 @@ export function RetrieveClient({ code, onBack }: RetrieveClientProps) {
 
     try {
       const result = await retrieve(code)
+      // @ts-ignore
       setFiles(result.files)
-      setExpiryDate(result.expiryDate)
+      setExpiryDate(result.expiryDate || '')
       setChestToken(result.chestToken)
       setHasRetrieved(true)
     } catch (error) {
@@ -75,14 +77,6 @@ export function RetrieveClient({ code, onBack }: RetrieveClientProps) {
     } catch (error) {
       console.error('Download failed:', error)
     }
-  }
-
-  const formatFileSize = (bytes: number): string => {
-    if (bytes === 0) return '0 Bytes'
-    const k = 1024
-    const sizes = ['Bytes', 'KB', 'MB', 'GB']
-    const i = Math.floor(Math.log(bytes) / Math.log(k))
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
   }
 
   const formatDate = (dateString: string): string => {

@@ -1,11 +1,16 @@
 import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'
-import { HTTPException } from 'hono/http-exception'
 import { eq } from 'drizzle-orm'
 import { Resend } from 'resend'
 import { sessions, files } from '@/database/schema'
-import type { CloudflareEnv } from '@/types'
 import { emailShareSchema, useDrizzle, withNotDeleted } from '@/lib'
+
+import {
+  formatFileSize,
+  type ApiResponse,
+  type emailShareResponse,
+} from '@cdlab996/dropply-utils'
+import type { CloudflareEnv } from '@/types'
 
 export const emailRoutes = new Hono<{ Bindings: CloudflareEnv }>()
 
@@ -13,16 +18,26 @@ emailRoutes.post(
   '/email/share',
   zValidator('json', emailShareSchema),
   async (c) => {
+    const requestId = c.get('requestId')
+
     if (!c.env.RESEND_API_KEY || c.env.ENABLE_EMAIL_SHARE !== 'true') {
-      throw new HTTPException(400, {
-        message: 'Email sharing is not enabled on this server',
-      })
+      return c.json<ApiResponse>(
+        {
+          code: 400,
+          message: 'Email sharing is not enabled on this server',
+        },
+        400,
+      )
     }
 
     if (!c.env.RESEND_FROM_EMAIL) {
-      throw new HTTPException(500, {
-        message: 'Email service not properly configured',
-      })
+      return c.json<ApiResponse>(
+        {
+          code: 500,
+          message: 'Email service not properly configured',
+        },
+        500,
+      )
     }
 
     const db = useDrizzle(c)
@@ -44,21 +59,33 @@ emailRoutes.post(
         .get()
 
       if (!session) {
-        throw new HTTPException(404, {
-          message: 'Retrieval code not found',
-        })
+        return c.json<ApiResponse>(
+          {
+            code: 404,
+            message: 'Retrieval code not found',
+          },
+          404,
+        )
       }
 
       if (!session.uploadComplete) {
-        throw new HTTPException(400, {
-          message: 'Files are not ready for sharing yet',
-        })
+        return c.json<ApiResponse>(
+          {
+            code: 400,
+            message: 'Files are not ready for sharing yet',
+          },
+          400,
+        )
       }
 
       if (session.expiresAt && session.expiresAt < new Date()) {
-        throw new HTTPException(404, {
-          message: 'Retrieval code has expired',
-        })
+        return c.json<ApiResponse>(
+          {
+            code: 404,
+            message: 'Retrieval code has expired',
+          },
+          404,
+        )
       }
 
       const sessionFiles = await db
@@ -67,14 +94,20 @@ emailRoutes.post(
         .where(withNotDeleted(files, eq(files.sessionId, session.id)))
 
       if (!sessionFiles || sessionFiles.length === 0) {
-        throw new HTTPException(404, {
-          message: 'No files found for this retrieval code',
-        })
+        return c.json<ApiResponse>(
+          {
+            code: 404,
+            message: 'No files found for this retrieval code',
+          },
+          404,
+        )
       }
 
       const resend = new Resend(c.env.RESEND_API_KEY)
+      const baseUrl = c.env.RESEND_WEB_URL || 'http://localhost:3001'
 
       const emailHtml = generateEmailTemplate(
+        baseUrl,
         retrievalCode,
         senderName,
         recipientName,
@@ -95,9 +128,13 @@ emailRoutes.post(
           error: emailData.error,
           retrievalCode,
         })
-        throw new HTTPException(500, {
-          message: 'Failed to send email. Please try again later.',
-        })
+        return c.json<ApiResponse>(
+          {
+            code: 500,
+            message: 'Failed to send email. Please try again later.',
+          },
+          500,
+        )
       }
 
       logger.info('Email sent successfully', {
@@ -107,29 +144,38 @@ emailRoutes.post(
         fileCount: sessionFiles.length,
       })
 
-      return c.json({
-        success: true,
-        message: 'Email sent successfully!',
+      return c.json<ApiResponse<emailShareResponse>>({
+        code: 0,
+        message: 'ok',
+        data: {
+          sent: true,
+          message: 'Email sent successfully!',
+        },
       })
     } catch (error) {
-      if (error instanceof HTTPException) {
-        throw error
-      }
+      logger.error(
+        `[${requestId}] Failed to send email, ${JSON.stringify({
+          error: error instanceof Error ? error.message : 'Unknown error',
+          retrievalCode,
+          recipientEmail,
+        })}`,
+      )
 
-      logger.error('Failed to send email', {
-        error: error instanceof Error ? error.message : 'Unknown error',
-        retrievalCode,
-        recipientEmail,
-      })
-
-      throw new HTTPException(500, {
-        message: 'An unexpected error occurred while sending the email',
-      })
+      const errorMessage =
+        error instanceof Error ? error.message : 'Failed to send email'
+      return c.json<ApiResponse>(
+        {
+          code: 500,
+          message: errorMessage,
+        },
+        500,
+      )
     }
   },
 )
 
 function generateEmailTemplate(
+  baseUrl: string,
   retrievalCode: string,
   senderName?: string,
   recipientName?: string,
@@ -141,20 +187,11 @@ function generateEmailTemplate(
     fileSize: number
   }>,
 ): string {
-  const baseUrl = process.env.FRONTEND_URL || 'https://dropply.pages.dev'
   const retrieveUrl = `${baseUrl}/retrieve?code=${retrievalCode}`
 
   const fileCount = sessionFiles?.length || 0
   const totalSize =
     sessionFiles?.reduce((sum, file) => sum + file.fileSize, 0) || 0
-
-  const formatFileSize = (bytes: number): string => {
-    if (bytes === 0) return '0 Bytes'
-    const k = 1024
-    const sizes = ['Bytes', 'KB', 'MB', 'GB']
-    const i = Math.floor(Math.log(bytes) / Math.log(k))
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
-  }
 
   const getExpiryText = (): string => {
     if (!expiresAt) return 'These files will not expire.'
@@ -235,8 +272,7 @@ function generateEmailTemplate(
       align-items: center;
     }
     .expiry-warning .icon { margin-right: 8px; font-size: 16px; }
-    
-    /* 移动端适配 */
+
     @media (max-width: 480px) {
       .container { padding: 15px; }
       .content { padding: 20px; }

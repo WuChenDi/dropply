@@ -53,7 +53,7 @@ export function EmailShare({
 
       const result = await api.shareViaEmail(requestData)
 
-      if (result.success) {
+      if (result.sent) {
         setSent(true)
         setTimeout(() => {
           onClose()
