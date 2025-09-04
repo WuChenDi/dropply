@@ -65,8 +65,8 @@ catalogs:
       specifier: ^0.44.4
       version: 0.44.4
     hono:
-      specifier: ^4.9.2
-      version: 4.9.4
+      specifier: ^4.9.6
+      version: 4.9.6
     lucide-react:
       specifier: ^0.540.0
       version: 0.540.0
@@ -125,7 +125,7 @@ importers:
         version: link:../../packages/utils
       '@hono/zod-validator':
         specifier: catalog:prod
-        version: 0.7.2(hono@4.9.4)(zod@4.0.17)
+        version: 0.7.2(hono@4.9.6)(zod@4.0.17)
       '@libsql/client':
         specifier: catalog:prod
         version: 0.15.12
@@ -137,7 +137,7 @@ importers:
         version: 0.44.4(@cloudflare/workers-types@4.20250822.0)(@libsql/client@0.15.12)
       hono:
         specifier: catalog:prod
-        version: 4.9.4
+        version: 4.9.6
       resend:
         specifier: catalog:prod
         version: 6.0.1(@react-email/render@1.2.1(react-dom@19.1.1(react@19.1.1))(react@19.1.1))
@@ -2509,8 +2509,8 @@ packages:
     resolution: {integrity: sha512-0hJU9SCPvmMzIBdZFqNPXWa6dqh7WdH0cII9y+CyS8rG3nL48Bclra9HmKhVVUHyPWNH5Y7xDwAB7bfgSjkUMQ==}
     engines: {node: '>= 0.4'}
 
-  hono@4.9.4:
-    resolution: {integrity: sha512-61hl6MF6ojTl/8QSRu5ran6GXt+6zsngIUN95KzF5v5UjiX/xnrLR358BNRawwIRO49JwUqJqQe3Rb2v559R8Q==}
+  hono@4.9.6:
+    resolution: {integrity: sha512-doVjXhSFvYZ7y0dNokjwwSahcrAfdz+/BCLvAMa/vHLzjj8+CFyV5xteThGUsKdkaasgN+gF2mUxao+SGLpUeA==}
     engines: {node: '>=16.9.0'}
 
   html-to-text@9.0.5:
@@ -3661,9 +3661,9 @@ snapshots:
 
   '@floating-ui/utils@0.2.10': {}
 
-  '@hono/zod-validator@0.7.2(hono@4.9.4)(zod@4.0.17)':
+  '@hono/zod-validator@0.7.2(hono@4.9.6)(zod@4.0.17)':
     dependencies:
-      hono: 4.9.4
+      hono: 4.9.6
       zod: 4.0.17
 
   '@img/sharp-darwin-arm64@0.33.5':
@@ -5028,7 +5028,7 @@ snapshots:
     dependencies:
       function-bind: 1.1.2
 
-  hono@4.9.4: {}
+  hono@4.9.6: {}
 
   html-to-text@9.0.5:
     dependencies:
