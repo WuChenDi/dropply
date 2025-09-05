@@ -323,7 +323,7 @@ export function RetrieveClient({ code, onBack }: RetrieveClientProps) {
                             onClick={() => handleDownload(file)}
                             className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white border-none"
                           >
-                            <Download size={16} className="mr-2" />
+                            <Download size={16} />
                             Download
                           </Button>
                         </div>
@@ -344,7 +344,7 @@ export function RetrieveClient({ code, onBack }: RetrieveClientProps) {
             variant="outline"
             className="border-border/50 bg-background/50 backdrop-blur-sm hover:bg-background/80"
           >
-            <ArrowLeft size={16} className="mr-2" />
+            <ArrowLeft size={16} />
             Enter Another Code
           </Button>
         )}
@@ -352,7 +352,7 @@ export function RetrieveClient({ code, onBack }: RetrieveClientProps) {
           onClick={() => (window.location.href = '/')}
           className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white border-none shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]"
         >
-          <Upload size={16} className="mr-2" />
+          <Upload size={16} />
           Upload Files
         </Button>
       </div>

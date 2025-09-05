@@ -360,7 +360,7 @@ export default function SharePage() {
                     'bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600',
                   )}
                 >
-                  <Upload className="mr-2 h-4 w-4" />
+                  <Upload size={16} />
                   Share More Files
                 </Button>
 
@@ -370,7 +370,7 @@ export default function SharePage() {
                     variant="outline"
                     className="flex-1 h-12 border border-border/50 bg-background/50 backdrop-blur-sm hover:bg-background/80 rounded-xl"
                   >
-                    <Mail className="mr-2 h-4 w-4" />
+                    <Mail size={16} />
                     Share via Email
                   </Button>
                 )}
@@ -381,7 +381,7 @@ export default function SharePage() {
                   className="flex-1 h-12 border border-border/50 bg-background/50 backdrop-blur-sm hover:bg-background/80 rounded-xl"
                 >
                   <Link href="/">
-                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    <ArrowLeft size={16} />
                     Back to Home
                   </Link>
                 </Button>
