@@ -59,8 +59,8 @@ catalogs:
       specifier: ^0.44.5
       version: 0.44.5
     hono:
-      specifier: ^4.9.6
-      version: 4.9.6
+      specifier: ^4.10.3
+      version: 4.10.3
     lucide-react:
       specifier: ^0.542.0
       version: 0.542.0
@@ -119,7 +119,7 @@ importers:
         version: link:../../packages/utils
       '@hono/zod-validator':
         specifier: catalog:prod
-        version: 0.7.2(hono@4.9.6)(zod@4.1.5)
+        version: 0.7.2(hono@4.10.3)(zod@4.1.5)
       '@libsql/client':
         specifier: catalog:prod
         version: 0.15.14
@@ -131,7 +131,7 @@ importers:
         version: 0.44.5(@cloudflare/workers-types@4.20250905.0)(@libsql/client@0.15.14)
       hono:
         specifier: catalog:prod
-        version: 4.9.6
+        version: 4.10.3
       resend:
         specifier: catalog:prod
         version: 6.0.2(@react-email/render@1.2.1(react-dom@19.1.1(react@19.1.1))(react@19.1.1))
@@ -2503,8 +2503,8 @@ packages:
     resolution: {integrity: sha512-0hJU9SCPvmMzIBdZFqNPXWa6dqh7WdH0cII9y+CyS8rG3nL48Bclra9HmKhVVUHyPWNH5Y7xDwAB7bfgSjkUMQ==}
     engines: {node: '>= 0.4'}
 
-  hono@4.9.6:
-    resolution: {integrity: sha512-doVjXhSFvYZ7y0dNokjwwSahcrAfdz+/BCLvAMa/vHLzjj8+CFyV5xteThGUsKdkaasgN+gF2mUxao+SGLpUeA==}
+  hono@4.10.3:
+    resolution: {integrity: sha512-2LOYWUbnhdxdL8MNbNg9XZig6k+cZXm5IjHn2Aviv7honhBMOHb+jxrKIeJRZJRmn+htUCKhaicxwXuUDlchRA==}
     engines: {node: '>=16.9.0'}
 
   html-to-text@9.0.5:
@@ -2576,6 +2576,7 @@ packages:
 
   libsql@0.5.22:
     resolution: {integrity: sha512-NscWthMQt7fpU8lqd7LXMvT9pi+KhhmTHAJWUB/Lj6MWa0MKFv0F2V4C6WKKpjCVZl0VwcDz4nOI3CyaT1DDiA==}
+    cpu: [x64, arm64, wasm32, arm]
     os: [darwin, linux, win32]
 
   lightningcss-darwin-arm64@1.30.1:
@@ -3654,9 +3655,9 @@ snapshots:
 
   '@floating-ui/utils@0.2.10': {}
 
-  '@hono/zod-validator@0.7.2(hono@4.9.6)(zod@4.1.5)':
+  '@hono/zod-validator@0.7.2(hono@4.10.3)(zod@4.1.5)':
     dependencies:
-      hono: 4.9.6
+      hono: 4.10.3
       zod: 4.1.5
 
   '@img/sharp-darwin-arm64@0.33.5':
@@ -5021,7 +5022,7 @@ snapshots:
     dependencies:
       function-bind: 1.1.2
 
-  hono@4.9.6: {}
+  hono@4.10.3: {}
 
   html-to-text@9.0.5:
     dependencies:
