@@ -2,7 +2,7 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "dropply-api",
   "main": "src/index.ts",
-  "compatibility_date": "2025-08-21",
+  "compatibility_date": "2025-11-05",
   "compatibility_flags": ["nodejs_compat"],
   "vars": {
     // The Service runtime preset to use for deployment.
