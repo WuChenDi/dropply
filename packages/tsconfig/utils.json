@@ -6,7 +6,7 @@
     "declaration": true,
     "module": "CommonJS",
     "moduleResolution": "Node",
-    "declarationMap": true,
+    "declarationMap": false,
     "target": "ES6",
     "types": ["node"]
   }
