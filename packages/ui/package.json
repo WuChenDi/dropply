@@ -35,26 +35,26 @@
     "typecheck": "tsc --project ./tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@radix-ui/react-accordion": "^1.2.12",
-    "@radix-ui/react-dialog": "^1.1.15",
-    "@radix-ui/react-hover-card": "^1.1.15",
-    "@radix-ui/react-label": "^2.1.8",
-    "@radix-ui/react-popover": "^1.1.15",
-    "@radix-ui/react-progress": "^1.1.8",
-    "@radix-ui/react-scroll-area": "^1.2.10",
-    "@radix-ui/react-select": "^2.2.6",
-    "@radix-ui/react-separator": "^1.1.8",
-    "@radix-ui/react-slider": "^1.3.6",
-    "@radix-ui/react-slot": "^1.2.4",
-    "@radix-ui/react-tabs": "^1.1.13",
-    "class-variance-authority": "^0.7.1",
-    "clsx": "^2.1.1",
-    "cmdk": "^1.1.1",
-    "lucide-react": "catalog:prod",
-    "ogl": "^1.0.11",
-    "react": "catalog:prod",
-    "react-dom": "catalog:prod",
-    "tailwind-merge": "catalog:prod"
+    "@radix-ui/react-accordion": "catalog:frontend",
+    "@radix-ui/react-dialog": "catalog:frontend",
+    "@radix-ui/react-hover-card": "catalog:frontend",
+    "@radix-ui/react-label": "catalog:frontend",
+    "@radix-ui/react-popover": "catalog:frontend",
+    "@radix-ui/react-progress": "catalog:frontend",
+    "@radix-ui/react-scroll-area": "catalog:frontend",
+    "@radix-ui/react-select": "catalog:frontend",
+    "@radix-ui/react-separator": "catalog:frontend",
+    "@radix-ui/react-slider": "catalog:frontend",
+    "@radix-ui/react-slot": "catalog:frontend",
+    "@radix-ui/react-tabs": "catalog:frontend",
+    "class-variance-authority": "catalog:frontend",
+    "clsx": "catalog:frontend",
+    "cmdk": "catalog:frontend",
+    "lucide-react": "catalog:frontend",
+    "ogl": "catalog:frontend",
+    "react": "catalog:frontend",
+    "react-dom": "catalog:frontend",
+    "tailwind-merge": "catalog:frontend"
   },
   "devDependencies": {
     "@cdlab996/dropply-tsconfig": "workspace:*",
@@ -64,6 +64,6 @@
     "@tailwindcss/postcss": "catalog:dev",
     "tailwindcss": "catalog:dev",
     "tsdown": "catalog:dev",
-    "tw-animate-css": "catalog:dev"
+    "tw-animate-css": "catalog:frontend"
   }
 }

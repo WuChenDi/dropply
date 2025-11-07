@@ -18,14 +18,14 @@
     "@cdlab996/dropply-ui": "workspace:*",
     "@cdlab996/dropply-uncrypto": "workspace:*",
     "@cdlab996/dropply-utils": "workspace:*",
-    "@next/third-parties": "catalog:prod",
-    "lucide-react": "catalog:prod",
-    "next": "catalog:prod",
-    "next-themes": "catalog:prod",
-    "react": "catalog:prod",
-    "react-dom": "catalog:prod",
-    "react-dropzone": "catalog:prod",
-    "sonner": "^2.0.7"
+    "@next/third-parties": "catalog:frontend",
+    "lucide-react": "catalog:frontend",
+    "next": "catalog:frontend",
+    "next-themes": "catalog:frontend",
+    "react": "catalog:frontend",
+    "react-dom": "catalog:frontend",
+    "react-dropzone": "catalog:frontend",
+    "sonner": "catalog:frontend"
   },
   "devDependencies": {
     "@cdlab996/dropply-tsconfig": "workspace:*",

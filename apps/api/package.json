@@ -26,15 +26,15 @@
   "dependencies": {
     "@cdlab996/dropply-uncrypto": "workspace:*",
     "@cdlab996/dropply-utils": "workspace:*",
-    "@hono/zod-validator": "catalog:prod",
-    "@libsql/client": "catalog:prod",
-    "@react-email/components": "catalog:prod",
-    "drizzle-orm": "catalog:prod",
-    "hono": "catalog:prod",
-    "resend": "catalog:prod",
-    "winston": "catalog:prod",
-    "winston-daily-rotate-file": "catalog:prod",
-    "zod": "catalog:prod"
+    "@hono/zod-validator": "catalog:backend",
+    "@libsql/client": "catalog:backend",
+    "@react-email/components": "catalog:backend",
+    "drizzle-orm": "catalog:backend",
+    "hono": "catalog:backend",
+    "resend": "catalog:backend",
+    "winston": "catalog:backend",
+    "winston-daily-rotate-file": "catalog:backend",
+    "zod": "catalog:backend"
   },
   "devDependencies": {
     "@cdlab996/dropply-tsconfig": "workspace:*",
