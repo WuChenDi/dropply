@@ -15,38 +15,40 @@
   "exports": {
     ".": {
       "browser": {
-        "types": "./dist/crypto.web.d.ts",
-        "import": "./dist/crypto.web.js",
+        "types": "./dist/crypto.web.d.mts",
+        "import": "./dist/crypto.web.mjs",
         "require": "./dist/crypto.web.cjs"
       },
       "node": {
-        "types": "./dist/crypto.node.d.ts",
-        "import": "./dist/crypto.node.js",
+        "types": "./dist/crypto.node.d.mts",
+        "import": "./dist/crypto.node.mjs",
         "require": "./dist/crypto.node.cjs"
       },
       "default": {
-        "types": "./dist/crypto.web.d.ts",
-        "import": "./dist/crypto.web.js"
+        "types": "./dist/crypto.web.d.mts",
+        "import": "./dist/crypto.web.mjs"
       }
     }
   },
   "main": "./dist/crypto.node.cjs",
-  "module": "./dist/crypto.web.js",
-  "browser": "./dist/crypto.web.js",
-  "types": "./dist/crypto.web.d.ts",
+  "module": "./dist/crypto.web.mjs",
+  "browser": "./dist/crypto.web.mjs",
+  "types": "./dist/crypto.web.d.mts",
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "tsup",
-    "dev": "tsup --watch",
-    "typecheck": "tsc --project ./tsconfig.json --noEmit",
-    "prepack": "pnpm build"
+    "build": "tsdown",
+    "dev": "tsdown --watch",
+    "test": "vitest --run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --project ./tsconfig.json --noEmit"
   },
   "devDependencies": {
     "@cdlab996/dropply-tsconfig": "workspace:*",
     "@types/node": "catalog:dev",
-    "tsup": "catalog:dev",
-    "typescript": "catalog:dev"
+    "tsdown": "catalog:dev",
+    "typescript": "catalog:dev",
+    "vitest": "catalog:dev"
   }
 }
