@@ -1,5 +1,5 @@
 import type { SQL } from 'drizzle-orm'
-import { eq, and } from 'drizzle-orm'
+import { and, eq } from 'drizzle-orm'
 
 /**
  * Helper function to add isDeleted = 0 condition to queries

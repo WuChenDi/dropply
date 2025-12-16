@@ -1,21 +1,21 @@
-import {
+import type {
   ApiResponse,
+  CompleteMultipartUploadResponse,
+  CompleteUploadResponse,
   ConfigResponse,
   CreateChestResponse,
-  UploadFileResponse,
-  CompleteUploadResponse,
-  RetrieveChestResponse,
   CreateMultipartUploadResponse,
-  UploadPartResponse,
-  CompleteMultipartUploadResponse,
-  emailShareResponse,
-  TextItem,
-  ValidityDays,
-  UploadPart,
-  UploadResponse,
-  MultipartUploadProgress,
-  FileUploadProgress,
   EmailShareRequest,
+  emailShareResponse,
+  FileUploadProgress,
+  MultipartUploadProgress,
+  RetrieveChestResponse,
+  TextItem,
+  UploadFileResponse,
+  UploadPart,
+  UploadPartResponse,
+  UploadResponse,
+  ValidityDays,
 } from '@cdlab996/dropply-utils'
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://localhost:3000'
@@ -270,7 +270,7 @@ export class PocketChestAPI {
             fileIndex < smallFiles.length &&
             activeUploads < MAX_CONCURRENT_SMALL_FILES
           ) {
-            uploadNextFile()
+            await uploadNextFile()
           }
         }
       }

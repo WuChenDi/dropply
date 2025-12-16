@@ -1,15 +1,11 @@
-import { Hono } from 'hono'
+import type { ApiResponse, emailShareResponse } from '@cdlab996/dropply-utils'
+import { formatFileSize } from '@cdlab996/dropply-utils'
 import { zValidator } from '@hono/zod-validator'
 import { eq } from 'drizzle-orm'
+import { Hono } from 'hono'
 import { Resend } from 'resend'
-import { sessions, files } from '@/database/schema'
+import { files, sessions } from '@/database/schema'
 import { emailShareSchema, useDrizzle, withNotDeleted } from '@/lib'
-
-import {
-  formatFileSize,
-  type ApiResponse,
-  type emailShareResponse,
-} from '@cdlab996/dropply-utils'
 import type { CloudflareEnv } from '@/types'
 
 export const emailRoutes = new Hono<{ Bindings: CloudflareEnv }>()
@@ -19,6 +15,7 @@ emailRoutes.post(
   zValidator('json', emailShareSchema),
   async (c) => {
     const requestId = c.get('requestId')
+    const db = useDrizzle(c)
 
     if (!c.env.RESEND_API_KEY || c.env.ENABLE_EMAIL_SHARE !== 'true') {
       return c.json<ApiResponse>(
@@ -40,7 +37,6 @@ emailRoutes.post(
       )
     }
 
-    const db = useDrizzle(c)
     const {
       retrievalCode,
       recipientEmail,

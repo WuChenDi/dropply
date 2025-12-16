@@ -1,19 +1,19 @@
 // components/EmailShare.tsx
 'use client'
 
-import { useState } from 'react'
-import { Mail, Send, X, CheckCircle } from 'lucide-react'
 import {
   Button,
-  Input,
-  Label,
-  Textarea,
   Card,
   CardContent,
   cn,
+  Input,
+  Label,
+  Textarea,
 } from '@cdlab996/dropply-ui'
+import type { EmailShareRequest } from '@cdlab996/dropply-utils'
+import { CheckCircle, Mail, Send, X } from 'lucide-react'
+import { useState } from 'react'
 import { PocketChestAPI } from '@/lib'
-import { EmailShareRequest } from '@cdlab996/dropply-utils'
 
 interface EmailShareProps {
   retrievalCode: string

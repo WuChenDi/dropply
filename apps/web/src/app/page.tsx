@@ -1,26 +1,25 @@
 import {
-  ArrowRight,
-  Upload,
-  Download,
-  Sparkles,
-  Shield,
-  Clock,
-  Zap,
-} from 'lucide-react'
-import Link from 'next/link'
-
-import {
-  cn,
-  GradientText,
-  ShinyText,
-  SplashCursor,
   Button,
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
+  cn,
+  GradientText,
+  ShinyText,
+  SplashCursor,
 } from '@cdlab996/dropply-ui'
+import {
+  ArrowRight,
+  Clock,
+  Download,
+  Shield,
+  Sparkles,
+  Upload,
+  Zap,
+} from 'lucide-react'
+import Link from 'next/link'
 
 interface Task {
   id: string

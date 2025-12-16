@@ -1,8 +1,8 @@
 import { subtle } from '@cdlab996/dropply-uncrypto'
 import type {
-  UploadJWTPayload,
   ChestJWTPayload,
   MultipartJWTPayload,
+  UploadJWTPayload,
 } from '@/types'
 
 // Safely encode UTF-8 string to base64url

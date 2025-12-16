@@ -1,4 +1,4 @@
-import { subtle, randomUUID, getRandomValues } from '@cdlab996/dropply-uncrypto'
+import { randomUUID } from '@cdlab996/dropply-uncrypto'
 
 // Generate UUID v4
 export function generateUUID(): string {
