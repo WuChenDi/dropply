@@ -1,6 +1,6 @@
-import { eq, and, lt } from 'drizzle-orm'
+import { and, eq, lt } from 'drizzle-orm'
+import { files, sessions } from '@/database/schema'
 import { useDrizzle, withNotDeleted } from '@/lib'
-import { sessions, files } from '@/database/schema'
 import type { CloudflareEnv } from '@/types'
 
 export interface CleanupResult {
@@ -14,6 +14,9 @@ export interface CleanupResult {
 export async function cleanupExpiredContent(
   env: CloudflareEnv,
 ): Promise<CleanupResult> {
+  // Create a mock context for database initialization
+  const db = useDrizzle({ env } as any)
+
   const currentTime = new Date()
   const errors: string[] = []
   let expiredSessions = 0
@@ -26,9 +29,6 @@ export async function cleanupExpiredContent(
   })
 
   try {
-    // Create a mock context for database initialization
-    const db = useDrizzle({ env } as any)
-
     if (!db) {
       throw new Error('Database connection failed')
     }

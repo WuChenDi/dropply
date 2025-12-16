@@ -1,6 +1,6 @@
+import type { ApiResponse, ConfigResponse } from '@cdlab996/dropply-utils'
 import { Hono } from 'hono'
 import type { CloudflareEnv } from '@/types'
-import type { ApiResponse, ConfigResponse } from '@cdlab996/dropply-utils'
 
 export const configRoutes = new Hono<{ Bindings: CloudflareEnv }>()
 

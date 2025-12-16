@@ -1,14 +1,14 @@
 import {
+  Archive,
+  Database,
   File,
+  FileCode,
+  FileSpreadsheet,
   FileText,
   Image,
-  Video,
   Music,
-  Archive,
-  FileSpreadsheet,
-  FileCode,
   Presentation,
-  Database,
+  Video,
 } from 'lucide-react'
 
 // File type configuration mapping

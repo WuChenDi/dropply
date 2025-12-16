@@ -1,18 +1,17 @@
-import { Hono } from 'hono'
-import { zValidator } from '@hono/zod-validator'
-import { eq, and } from 'drizzle-orm'
-import { sessions, files } from '@/database/schema'
-import {
-  useDrizzle,
-  withNotDeleted,
-  createChestJWT,
-  retrievalCodeParamSchema,
-} from '@/lib'
-
 import type {
   ApiResponse,
   RetrieveChestResponse,
 } from '@cdlab996/dropply-utils'
+import { zValidator } from '@hono/zod-validator'
+import { and, eq } from 'drizzle-orm'
+import { Hono } from 'hono'
+import { files, sessions } from '@/database/schema'
+import {
+  createChestJWT,
+  retrievalCodeParamSchema,
+  useDrizzle,
+  withNotDeleted,
+} from '@/lib'
 import type { CloudflareEnv } from '@/types'
 
 export const retrieveRoutes = new Hono<{ Bindings: CloudflareEnv }>()
@@ -23,9 +22,9 @@ retrieveRoutes.get(
   zValidator('param', retrievalCodeParamSchema),
   async (c) => {
     const requestId = c.get('requestId')
+    const db = useDrizzle(c)
 
     try {
-      const db = useDrizzle(c)
       const { retrievalCode } = c.req.valid('param')
 
       // Find session

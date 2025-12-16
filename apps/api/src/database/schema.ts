@@ -1,9 +1,9 @@
 import {
+  index,
   integer,
   sqliteTable,
   text,
   uniqueIndex,
-  index,
 } from 'drizzle-orm/sqlite-core'
 
 const trackingFields = {

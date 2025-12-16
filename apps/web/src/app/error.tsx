@@ -1,12 +1,12 @@
 'use client'
 
 import {
-  GradientText,
-  ShinyText,
   Button,
   Card,
   CardContent,
   CardHeader,
+  GradientText,
+  ShinyText,
 } from '@cdlab996/dropply-ui'
 
 export default function Error({ reset }: { reset: () => void }) {

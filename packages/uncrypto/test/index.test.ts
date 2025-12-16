@@ -16,7 +16,7 @@ function runTests(crypto: Crypto) {
   it('randomUUID should generate valid UUID v4', () => {
     const uuid = crypto.randomUUID()
     expect(uuid).toMatch(
-      /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+      /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i,
     )
 
     const uuid2 = crypto.randomUUID()

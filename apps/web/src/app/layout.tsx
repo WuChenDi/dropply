@@ -1,8 +1,7 @@
+import { Aurora, Particles } from '@cdlab996/dropply-ui'
 import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import { Toaster } from 'sonner'
-
-import { Aurora, Particles } from '@cdlab996/dropply-ui'
 
 import { Providers } from '@/app/providers'
 import Footer from '@/components/footer'

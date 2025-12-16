@@ -1,39 +1,36 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import Link from 'next/link'
 import {
-  ArrowLeft,
-  Upload,
-  FileText,
-  Clock,
-  Copy,
-  CheckCircle,
-  X,
-  Mail,
-} from 'lucide-react'
-
-import {
-  cn,
-  GradientText,
-  ShinyText,
   Button,
   Card,
   CardContent,
   CardDescription,
   CardTitle,
+  cn,
+  GradientText,
+  ShinyText,
 } from '@cdlab996/dropply-ui'
-
+import type { TextItem, ValidityDays } from '@cdlab996/dropply-utils'
+import {
+  ArrowLeft,
+  CheckCircle,
+  Clock,
+  Copy,
+  FileText,
+  Mail,
+  Upload,
+  X,
+} from 'lucide-react'
+import Link from 'next/link'
+import { useEffect, useState } from 'react'
+import { EmailShare } from '@/components/EmailShare'
+import { ExpirySelector } from '@/components/ExpirySelector'
 import { FileUpload } from '@/components/FileUpload'
 import { TextInput } from '@/components/TextInput'
-import { ExpirySelector } from '@/components/ExpirySelector'
 import { TOTPModal } from '@/components/TOTPModal'
 import { UploadProgress } from '@/components/UploadProgress'
-import { EmailShare } from '@/components/EmailShare'
-
 import { usePocketChest } from '@/hooks/usePocketChest'
 import { PocketChestAPI } from '@/lib'
-import { TextItem, ValidityDays } from '@cdlab996/dropply-utils'
 
 export default function SharePage() {
   const [files, setFiles] = useState<File[]>([])
@@ -74,6 +71,7 @@ export default function SharePage() {
   const api = new PocketChestAPI()
 
   // Fetch config and initialize session
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
     const initializeApp = async () => {
       try {
@@ -104,6 +102,7 @@ export default function SharePage() {
       }
     }
 
+    // biome-ignore lint/nursery/noFloatingPromises: <explanation>
     initializeApp()
   }, [])
 
