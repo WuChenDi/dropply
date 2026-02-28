@@ -1,3 +1,8 @@
+> [!WARNING]
+> This repository has been moved to:
+> - [dropply-web](https://github.com/WuChenDi/projects/tree/main/apps/dropply-web)
+> - [dropply-api](https://github.com/WuChenDi/projects/tree/main/apps/dropply-api)
+
 # Dropply
 
 A secure file sharing platform built with Next.js and Cloudflare Workers. no accounts required.
